@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LP ジェネレーター — 設定フォーム</title>
+  <style>
+    :root {
+      --bg:       #FFFDFC;
+      --surface:  #FFFFFF;
+      --border:   #E4DCDA;
+      --text:     #2E2A29;
+      --muted:    #7A706D;
+      --accent:   #2E2A29;
+      --pink:     #F3E7E2;
+      --green:    #2A6E52;
+      --red:      #B94040;
+      --radius:   4px;
+      --max-w:    780px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Meiryo', sans-serif;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    /* ── ヘッダー ── */
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--accent);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      height: 52px;
+    }
+    .app-header__title { font-size: 14px; letter-spacing: 0.08em; }
+    .app-header__actions { display: flex; gap: 8px; }
+
+    /* ── タブ ── */
+    .tab-nav {
+      display: flex;
+      border-bottom: 2px solid var(--border);
+      background: var(--surface);
+      padding: 0 24px;
+    }
+    .tab-btn {
+      padding: 14px 20px;
+      font-size: 13px;
+      font-family: inherit;
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      cursor: pointer;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .tab-btn.is-active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+      font-weight: bold;
+    }
+
+    /* ── タブパネル ── */
+    .tab-panel { display: none; }
+    .tab-panel.is-active { display: block; }
+
+    /* ── コンテナ ── */
+    .form-wrap {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 32px 24px 120px;
+    }
+
+    /* ── セクション ── */
+    .form-section {
+      margin-bottom: 40px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .form-section__header {
+      padding: 14px 20px;
+      background: var(--pink);
+      border-bottom: 1px solid var(--border);
+      font-size: 12px;
+      font-weight: bold;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+    .form-section__body {
+      padding: 20px;
+      display: grid;
+      gap: 18px;
+    }
+    .form-section__body.cols-2 {
+      grid-template-columns: 1fr 1fr;
+    }
+    @media (max-width: 560px) {
+      .form-section__body.cols-2 { grid-template-columns: 1fr; }
+    }
+
+    /* ── フォーム要素 ── */
+    .field { display: grid; gap: 5px; }
+    .field.span-2 { grid-column: 1 / -1; }
+
+    label {
+      font-size: 12px;
+      font-weight: bold;
+      color: var(--text);
+      letter-spacing: 0.03em;
+    }
+    .field-hint {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    input[type="text"],
+    input[type="url"],
+    textarea,
+    select {
+      width: 100%;
+      padding: 9px 12px;
+      font-size: 13px;
+      font-family: inherit;
+      color: var(--text);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      outline: none;
+      transition: border-color 0.15s;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    input[type="text"]:focus,
+    input[type="url"]:focus,
+    textarea:focus,
+    select:focus {
+      border-color: var(--accent);
+    }
+    textarea { resize: vertical; min-height: 90px; }
+    select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M0 0l6 8 6-8z' fill='%237A706D'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; cursor: pointer; }
+
+    /* カラーピッカー */
+    .color-field {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    input[type="color"] {
+      width: 40px;
+      height: 38px;
+      padding: 2px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--bg);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    /* ラジオ・チェックボックスグループ */
+    .check-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .check-label {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 12px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 12px;
+      color: var(--text);
+      transition: background 0.12s, border-color 0.12s;
+      user-select: none;
+    }
+    .check-label input { position: absolute; opacity: 0; width: 0; height: 0; }
+    .check-label:has(input:checked) {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    /* ── FAQ動的リスト ── */
+    .faq-list { display: grid; gap: 12px; }
+    .faq-item {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .faq-item__head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      background: var(--pink);
+      font-size: 11px;
+      font-weight: bold;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+    .faq-item__body {
+      padding: 12px;
+      display: grid;
+      gap: 8px;
+    }
+    .faq-item__body textarea { min-height: 60px; }
+
+    .btn-text {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 12px;
+      font-family: inherit;
+      color: var(--muted);
+      padding: 2px 6px;
+      border-radius: 2px;
+    }
+    .btn-text:hover { color: var(--red); }
+    .btn-add {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 8px 14px;
+      background: none;
+      border: 1px dashed var(--border);
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-size: 12px;
+      font-family: inherit;
+      color: var(--muted);
+      width: 100%;
+      transition: border-color 0.12s, color 0.12s;
+    }
+    .btn-add:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ── ボタン ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 0 20px;
+      height: 38px;
+      font-size: 13px;
+      font-family: inherit;
+      letter-spacing: 0.05em;
+      border-radius: var(--radius);
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.15s;
+    }
+    .btn--primary {
+      background: var(--surface);
+      color: var(--accent);
+      border-color: var(--border);
+    }
+    .btn--primary:hover { border-color: var(--accent); }
+    .btn--save {
+      background: var(--green);
+      color: #fff;
+      border-color: var(--green);
+    }
+    .btn--save:hover { opacity: 0.88; }
+    .btn--save:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* ── 固定保存バー ── */
+    .save-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: rgba(255,253,252,0.95);
+      backdrop-filter: blur(6px);
+      border-top: 1px solid var(--border);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 90;
+    }
+    .save-bar__msg {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* ── トースト通知 ── */
+    .toast {
+      position: fixed;
+      bottom: 72px;
+      left: 50%;
+      transform: translateX(-50%) translateY(16px);
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: bold;
+      letter-spacing: 0.04em;
+      opacity: 0;
+      transition: opacity 0.2s, transform 0.2s;
+      pointer-events: none;
+      z-index: 200;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+    .toast--ok  { background: var(--green); color: #fff; }
+    .toast--err { background: var(--red);   color: #fff; }
+
+    /* ── ローディング ── */
+    .loading {
+      text-align: center;
+      padding: 60px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ヘッダー -->
+<header class="app-header">
+  <span class="app-header__title">LP Generator — 設定フォーム</span>
+  <div class="app-header__actions">
+    <button class="btn btn--primary" onclick="handleLoad()">↺ 再読み込み</button>
+    <button class="btn btn--save" id="save-btn" onclick="handleSave()">保存する</button>
+  </div>
+</header>
+
+<!-- タブ -->
+<nav class="tab-nav">
+  <button class="tab-btn is-active" data-tab="brand" onclick="switchTab('brand', this)">
+    ① ブランド設定
+  </button>
+  <button class="tab-btn" data-tab="content" onclick="switchTab('content', this)">
+    ② コンテンツ素材
+  </button>
+</nav>
+
+<!-- ── タブ①: ブランド設定 ── -->
+<div class="tab-panel is-active" id="tab-brand">
+  <div class="form-wrap">
+
+    <!-- 基本情報 -->
+    <div class="form-section">
+      <div class="form-section__header">基本情報</div>
+      <div class="form-section__body cols-2">
+        <div class="field">
+          <label>ブランド名</label>
+          <input type="text" id="brand_name" placeholder="例: Lumière">
+        </div>
+        <div class="field">
+          <label>ブランドスローガン <span style="font-weight:normal;color:var(--muted)">（任意）</span></label>
+          <input type="text" id="brand_tagline" placeholder="例: やさしく、静かに、うるおいを。">
+        </div>
+        <div class="field">
+          <label>商品名・サービス名</label>
+          <input type="text" id="product_name" placeholder="例: ルミエール モイストセラム">
+        </div>
+        <div class="field">
+          <label>商品キャッチコピー <span style="font-weight:normal;color:var(--muted)">（任意）</span></label>
+          <input type="text" id="product_tagline" placeholder="例: 乾燥が気になる日も、うるおいを手放さない">
+          <p class="field-hint">ヒーローに表示される短いコピー。空欄だとClaudeが生成します。</p>
+        </div>
+        <div class="field">
+          <label>商材カテゴリ</label>
+          <select id="category">
+            <option value="cosmetics">cosmetics — 化粧品・美容液・スキンケア</option>
+            <option value="supplement">supplement — サプリ・健康食品</option>
+            <option value="apparel">apparel — 衣類・ファッション</option>
+            <option value="course">course — 講座・教材・書籍</option>
+            <option value="app">app — アプリ・デジタルサービス</option>
+            <option value="food">food — 食品・飲料</option>
+            <option value="other">other — その他</option>
+          </select>
+          <p class="field-hint">デザインの余白・フォント・雰囲気に影響します。</p>
+        </div>
+        <div class="field">
+          <label>LPのゴール</label>
+          <select id="lp_goal">
+            <option value="purchase">purchase — 商品購入</option>
+            <option value="lead">lead — 問い合わせ・資料請求</option>
+            <option value="trial">trial — 無料体験・サンプル申し込み</option>
+            <option value="signup">signup — 会員登録・LINE登録</option>
+          </select>
+        </div>
+        <div class="field span-2">
+          <label>ターゲット像</label>
+          <input type="text" id="target_audience" placeholder="例: 30代女性、乾燥肌・敏感肌寄り、忙しくてもスキンケアはちゃんとしたい人">
+          <p class="field-hint">年代・性別・悩み・ライフスタイルを具体的に書くほど、Claudeのコピーが的確になります。</p>
+        </div>
+        <div class="field">
+          <label>キャンペーン種別</label>
+          <select id="campaign_type">
+            <option value="new_customer">new_customer — 新規顧客獲得</option>
+            <option value="repeat">repeat — リピーター向け</option>
+            <option value="seasonal">seasonal — 季節キャンペーン</option>
+            <option value="launch">launch — 新発売</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- デザイントーン -->
+    <div class="form-section">
+      <div class="form-section__header">デザイントーン</div>
+      <div class="form-section__body">
+
+        <div class="field">
+          <label>ブランドのトーン <span style="font-weight:normal;color:var(--muted)">（複数選択可）</span></label>
+          <p class="field-hint">選んだキーワードの組み合わせがデザインの雰囲気になります。</p>
+          <div class="check-group" id="brand_tone_group">
+            <label class="check-label"><input type="checkbox" name="brand_tone" value="clean"> clean（清潔感・シンプル）</label>
+            <label class="check-label"><input type="checkbox" name="brand_tone" value="premium"> premium（上質・高級感）</label>
+            <label class="check-label"><input type="checkbox" name="brand_tone" value="energetic"> energetic（活気・鮮やか）</label>
+            <label class="check-label"><input type="checkbox" name="brand_tone" value="playful"> playful（楽しい・明るい）</label>
+            <label class="check-label"><input type="checkbox" name="brand_tone" value="bold"> bold（力強い・インパクト）</label>
+            <label class="check-label"><input type="checkbox" name="brand_tone" value="warm"> warm（温かい・やわらかい）</label>
+            <label class="check-label"><input type="checkbox" name="brand_tone" value="reassuring"> reassuring（安心感・信頼）</label>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>ファーストビューのスタイル</label>
+          <div class="check-group">
+            <label class="check-label"><input type="radio" name="hero_style" value="emotional" checked> emotional（悩みに寄り添う共感訴求）</label>
+            <label class="check-label"><input type="radio" name="hero_style" value="bold"> bold（商品・コピーを力強く前面に）</label>
+            <label class="check-label"><input type="radio" name="hero_style" value="simple"> simple（シンプル・余白重視）</label>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>CTAボタンの強さ</label>
+          <p class="field-hint">ボタン周辺の言葉選びに影響します。</p>
+          <div class="check-group">
+            <label class="check-label"><input type="radio" name="cta_style" value="soft" checked> soft（やわらかく自然）</label>
+            <label class="check-label"><input type="radio" name="cta_style" value="bold"> bold（行動を強く促す）</label>
+            <label class="check-label"><input type="radio" name="cta_style" value="urgent"> urgent（限定感・緊急性）</label>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>フォントの方向性</label>
+          <div class="check-group">
+            <label class="check-label"><input type="radio" name="font_style" value="serif" checked> serif（明朝系・上質感・高級感）</label>
+            <label class="check-label"><input type="radio" name="font_style" value="sans"> sans（ゴシック系・読みやすさ優先）</label>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>ビジュアルキーワード <span style="font-weight:normal;color:var(--muted)">（改行で区切って3〜6個）</span></label>
+          <textarea id="visual_keywords" rows="3" placeholder="透明感&#10;自然光&#10;清潔感&#10;上質"></textarea>
+          <p class="field-hint">デザインの雰囲気を言葉で表したキーワード。Claudeがグラデーション・余白・装飾を決める際に使います。</p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- カラー -->
+    <div class="form-section">
+      <div class="form-section__header">カラー設定</div>
+      <div class="form-section__body cols-2">
+        <div class="field">
+          <label>メインカラー</label>
+          <div class="color-field">
+            <input type="color" id="main_color_picker" value="#F3E7E2" oninput="syncColor(this,'main_color')">
+            <input type="text"  id="main_color" value="#F3E7E2" placeholder="#F3E7E2" oninput="syncPicker(this,'main_color_picker')" style="font-family:monospace;">
+          </div>
+          <p class="field-hint">セクション背景などに使う淡い色。ブランドカラーの薄い版が馴染みやすい。</p>
+        </div>
+        <div class="field">
+          <label>アクセントカラー</label>
+          <div class="color-field">
+            <input type="color" id="accent_color_picker" value="#2E2A29" oninput="syncColor(this,'accent_color')">
+            <input type="text"  id="accent_color" value="#2E2A29" placeholder="#2E2A29" oninput="syncPicker(this,'accent_color_picker')" style="font-family:monospace;">
+          </div>
+          <p class="field-hint">ボタン・見出し・ボーダーに使うブランドのシグネチャーカラー。</p>
+        </div>
+        <div class="field">
+          <label>背景色（ベース）</label>
+          <div class="color-field">
+            <input type="color" id="base_bg_color_picker" value="#FFFDFC" oninput="syncColor(this,'base_bg_color')">
+            <input type="text"  id="base_bg_color" value="#FFFDFC" placeholder="#FFFDFC" oninput="syncPicker(this,'base_bg_color_picker')" style="font-family:monospace;">
+          </div>
+          <p class="field-hint">ページ全体の地の色。白または白に近い色を推奨。</p>
+        </div>
+        <div class="field">
+          <label>ヒーロー背景スタイル</label>
+          <select id="hero_bg_style">
+            <option value="gradient">gradient（グラデーション・やわらかい）</option>
+            <option value="solid">solid（単色・シンプル）</option>
+            <option value="pattern">pattern（幾何学模様・モダン）</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- 価格・オファー -->
+    <div class="form-section">
+      <div class="form-section__header">価格・オファー</div>
+      <div class="form-section__body cols-2">
+        <div class="field">
+          <label>価格帯</label>
+          <select id="price_band">
+            <option value="low">low — ～¥1,000（衝動買い向き）</option>
+            <option value="mid">mid — ¥1,000〜¥5,000</option>
+            <option value="mid-high" selected>mid-high — ¥5,000〜¥15,000</option>
+            <option value="high">high — ¥15,000〜¥50,000</option>
+            <option value="premium">premium — ¥50,000〜</option>
+          </select>
+          <p class="field-hint">余白量・CTAの強度・コピーのトーンに影響します。</p>
+        </div>
+        <div class="field">
+          <label>表示価格</label>
+          <input type="text" id="price_display" placeholder="例: ¥5,500（税込）">
+        </div>
+        <div class="field span-2">
+          <label>オファー・特典</label>
+          <input type="text" id="offer_details" placeholder="例: 初回限定 20%OFF・送料無料">
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="form-section">
+      <div class="form-section__header">CTA（行動ボタン）</div>
+      <div class="form-section__body cols-2">
+        <div class="field">
+          <label>メインボタンの文言</label>
+          <input type="text" id="cta_label" placeholder="例: 初回限定で購入する">
+          <p class="field-hint">LP全体で統一して使われます。15文字以内推奨。</p>
+        </div>
+        <div class="field">
+          <label>サブボタンの文言</label>
+          <input type="text" id="cta_sub_label" placeholder="例: 商品を詳しく見る">
+          <p class="field-hint">ヒーロー下などに置く「まず詳しく見たい人」向けの導線。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- LP構成 -->
+    <div class="form-section">
+      <div class="form-section__header">LP構成テンプレート</div>
+      <div class="form-section__body">
+        <div class="field">
+          <label>構成の流れ</label>
+          <div class="check-group">
+            <label class="check-label"><input type="radio" name="structure_template" value="story" checked> story — 共感→出会い→特徴→信頼→CTA（感情・世界観重視）</label>
+            <label class="check-label"><input type="radio" name="structure_template" value="trust"> trust — 課題→根拠→特徴→レビュー→CTA（信頼性重視）</label>
+            <label class="check-label"><input type="radio" name="structure_template" value="offer"> offer — オファー→メリット→根拠→CTA（割引・特典重視）</label>
+          </div>
+        </div>
+        <div class="field">
+          <label>コンテンツ幅</label>
+          <div class="check-group">
+            <label class="check-label"><input type="radio" name="layout_width" value="narrow" checked> narrow（〜720px・読み物・美容向き）</label>
+            <label class="check-label"><input type="radio" name="layout_width" value="standard"> standard（〜960px・汎用）</label>
+            <label class="check-label"><input type="radio" name="layout_width" value="wide"> wide（〜1200px・情報量多め）</label>
+          </div>
+        </div>
+        <div class="field">
+          <label>セクション余白</label>
+          <div class="check-group">
+            <label class="check-label"><input type="radio" name="section_spacing" value="compact"> compact（詰め気味）</label>
+            <label class="check-label"><input type="radio" name="section_spacing" value="standard" checked> standard（標準）</label>
+            <label class="check-label"><input type="radio" name="section_spacing" value="large"> large（余白広め・premium向き）</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 信頼要素 -->
+    <div class="form-section">
+      <div class="form-section__header">信頼要素</div>
+      <div class="form-section__body">
+        <div class="field">
+          <label>LPに掲載する信頼要素 <span style="font-weight:normal;color:var(--muted)">（複数選択可）</span></label>
+          <div class="check-group">
+            <label class="check-label"><input type="checkbox" name="trust_elements" value="レビュー"> レビュー</label>
+            <label class="check-label"><input type="checkbox" name="trust_elements" value="SNS掲載"> SNS掲載</label>
+            <label class="check-label"><input type="checkbox" name="trust_elements" value="返金保証"> 返金保証</label>
+            <label class="check-label"><input type="checkbox" name="trust_elements" value="専門家監修"> 専門家監修</label>
+            <label class="check-label"><input type="checkbox" name="trust_elements" value="メディア掲載"> メディア掲載</label>
+            <label class="check-label"><input type="checkbox" name="trust_elements" value="認証マーク"> 認証マーク</label>
+            <label class="check-label"><input type="checkbox" name="trust_elements" value="販売実績"> 販売実績</label>
+          </div>
+        </div>
+        <div class="field">
+          <label>返金保証の説明文 <span style="font-weight:normal;color:var(--muted)">（「返金保証」を選んだ場合）</span></label>
+          <textarea id="guarantee_text" rows="2" placeholder="例: 初めてご購入いただいて商品が合わなかった場合、所定の条件のもとご返金対応いたします。"></textarea>
+        </div>
+        <div class="field">
+          <label>SNS掲載プラットフォーム <span style="font-weight:normal;color:var(--muted)">（「SNS掲載」を選んだ場合）</span></label>
+          <div class="check-group">
+            <label class="check-label"><input type="checkbox" name="sns_platforms" value="Instagram"> Instagram</label>
+            <label class="check-label"><input type="checkbox" name="sns_platforms" value="X（旧Twitter）"> X（旧Twitter）</label>
+            <label class="check-label"><input type="checkbox" name="sns_platforms" value="TikTok"> TikTok</label>
+            <label class="check-label"><input type="checkbox" name="sns_platforms" value="YouTube"> YouTube</label>
+            <label class="check-label"><input type="checkbox" name="sns_platforms" value="LINE"> LINE</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- フォーム設定 -->
+    <div class="form-section">
+      <div class="form-section__header">申し込みフォーム設定</div>
+      <div class="form-section__body">
+        <div class="field">
+          <label>フォームの入力項目 <span style="font-weight:normal;color:var(--muted)">（最大6項目推奨）</span></label>
+          <p class="field-hint">多すぎると離脱率が上がります。LPのゴールに合わせて必要なものだけ選んでください。</p>
+          <div class="check-group" id="form_fields_group">
+            <label class="check-label"><input type="checkbox" name="form_fields" value="氏名"> 氏名</label>
+            <label class="check-label"><input type="checkbox" name="form_fields" value="メールアドレス"> メールアドレス</label>
+            <label class="check-label"><input type="checkbox" name="form_fields" value="住所"> 住所</label>
+            <label class="check-label"><input type="checkbox" name="form_fields" value="電話番号"> 電話番号</label>
+            <label class="check-label"><input type="checkbox" name="form_fields" value="ニックネーム"> ニックネーム</label>
+            <label class="check-label"><input type="checkbox" name="form_fields" value="お問い合わせ内容"> お問い合わせ内容</label>
+          </div>
+        </div>
+        <div class="field">
+          <label>フォーム送信ボタンの文言</label>
+          <input type="text" id="form_submit_label" placeholder="例: 内容を確認して申し込む">
+        </div>
+      </div>
+    </div>
+
+    <!-- 法的注意 -->
+    <div class="form-section">
+      <div class="form-section__header">表現ルール・法的注意</div>
+      <div class="form-section__body">
+        <div class="field">
+          <label>Claudeへの表現制約 <span style="font-weight:normal;color:var(--muted)">（1行1項目）</span></label>
+          <textarea id="legal_notes" rows="3" placeholder="例:&#10;薬機法に配慮すること&#10;効果効能を断定しないこと&#10;誇大表現を避けること"></textarea>
+          <p class="field-hint">ここに書いた制約に反するコピーはClaudeが生成しません。業種に応じて変更してください。</p>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /form-wrap -->
+</div><!-- /tab-brand -->
+
+
+<!-- ── タブ②: コンテンツ素材 ── -->
+<div class="tab-panel" id="tab-content">
+  <div class="form-wrap">
+
+    <div class="form-section">
+      <div class="form-section__header">商品・サービスの説明</div>
+      <div class="form-section__body">
+        <div class="field">
+          <label>商品概要</label>
+          <textarea id="product_overview" rows="4" placeholder="例: 高保湿タイプの導入美容液。角質層までうるおいを届け、乾燥によるくすみが気になる肌をしっとりなめらかに整えます。"></textarea>
+          <p class="field-hint">「この商品は何ですか？」と聞かれたときの答えを2〜3文で。難しく考えず、口頭で説明するように書くのがコツです。</p>
+        </div>
+        <div class="field">
+          <label>ターゲットの悩み <span style="font-weight:normal;color:var(--muted)">（1行1項目）</span></label>
+          <textarea id="target_concerns" rows="4" placeholder="例:&#10;肌の乾燥が気になるのに、何を使えばいいかわからない&#10;スキンケアに時間をかけられない&#10;強すぎる宣伝が苦手で、信頼できるブランドを探している"></textarea>
+          <p class="field-hint">「そうそう、これが悩みだ」と感じてもらえる言葉で。「〜できない」「〜が不安」という形が共感を生みやすい。</p>
+        </div>
+        <div class="field">
+          <label>ベネフィット <span style="font-weight:normal;color:var(--muted)">（1行1項目）</span></label>
+          <textarea id="benefits" rows="4" placeholder="例:&#10;忙しい朝でも、さっと使えてスキンケアが苦にならない&#10;うるおい感のある、なめらかな肌印象が続く&#10;スキンケアの時間が、前向きな気分になれる時間になる"></textarea>
+          <p class="field-hint">「機能」ではなく「使った後の嬉しさ・生活の変化」で書くと刺さります。NG：「セラミド配合」 → OK：「肌がもちっとして、朝のメイクのりが変わった」</p>
+        </div>
+        <div class="field">
+          <label>主な特徴 <span style="font-weight:normal;color:var(--muted)">（1行1項目）</span></label>
+          <textarea id="features" rows="4" placeholder="例:&#10;軽やかなテクスチャで、肌なじみが良い&#10;朝晩どちらにも使える設計&#10;敏感肌の方も取り入れやすいよう処方を吟味"></textarea>
+          <p class="field-hint">成分・仕様・設計など「なぜそのベネフィットが得られるか」の根拠を書くと説得力が増します。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section__header">オファー・CTA</div>
+      <div class="form-section__body">
+        <div class="field">
+          <label>オファー内容</label>
+          <input type="text" id="offer" placeholder="例: 初回限定 20%OFF / 送料無料">
+        </div>
+        <div class="field">
+          <label>CTA補足メモ <span style="font-weight:normal;color:var(--muted)">（任意）</span></label>
+          <textarea id="cta_note" rows="2" placeholder="例: 迷っている方にも自然に背中を押せるような、やわらかい言葉で。購入を急かしすぎない。"></textarea>
+          <p class="field-hint">ボタン周辺のコピーの雰囲気について補足があれば。なければ空欄でOKです。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section__header">よくある質問（FAQ）</div>
+      <div class="form-section__body">
+        <p class="field-hint" style="margin-bottom:4px">お客様が購入前に迷う質問を追加してください。3〜5問が目安です。</p>
+        <div class="faq-list" id="faq-list"></div>
+        <button class="btn-add" type="button" onclick="addFaq()">＋ 質問を追加する</button>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section__header">お客様の声・レビュー</div>
+      <div class="form-section__body">
+        <div class="field">
+          <label>レビュー <span style="font-weight:normal;color:var(--muted)">（1行1件）</span></label>
+          <textarea id="reviews" rows="5" placeholder="例:&#10;しっとり感があって、気分よく使えています（30代・乾燥肌）&#10;パッケージが上品で、洗面台に置いておきたくなる（30代・混合肌）&#10;忙しい日でも続けやすいテクスチャで助かっています（20代・普通肌）"></textarea>
+          <p class="field-hint">「（年代・肌タイプ）」などの属性を添えると信頼感が増します。3〜5件が目安。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section__header">ビジュアル素材（画像差し替え）</div>
+      <div class="form-section__body">
+        <p class="field-hint" style="margin-bottom:4px">画像ファイルがある場合はパスを入力してください。ない場合は空欄でOKです（CSSで代替されます）。<br>生成後のHTMLには <code>[IMAGE-PLACEHOLDER]</code> コメントが入るので、そこから差し替えられます。</p>
+        <div class="field">
+          <label>ヒーロー背景画像</label>
+          <input type="text" id="hero_image" placeholder="例: images/hero-bg.jpg（横長・1440×900px以上推奨）">
+        </div>
+        <div class="field">
+          <label>商品メイン画像</label>
+          <input type="text" id="product_image" placeholder="例: images/product-main.png（縦長・白背景または透過PNG推奨）">
+        </div>
+        <div class="field">
+          <label>SNS・ライフスタイル画像 <span style="font-weight:normal;color:var(--muted)">（カンマ区切りで複数可）</span></label>
+          <input type="text" id="sns_images" placeholder="例: images/sns-01.jpg, images/sns-02.jpg, images/sns-03.jpg">
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section__header">注意事項・免責</div>
+      <div class="form-section__body">
+        <div class="field">
+          <label>フッターに掲載する注意書き <span style="font-weight:normal;color:var(--muted)">（1行1項目）</span></label>
+          <textarea id="legal_disclaimers" rows="3" placeholder="例:&#10;使用感には個人差があります。&#10;肌に異常が生じた場合はご使用を中止し、専門家にご相談ください。&#10;効果・効能を保証するものではありません。"></textarea>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /form-wrap -->
+</div><!-- /tab-content -->
+
+<!-- 固定保存バー -->
+<div class="save-bar">
+  <span class="save-bar__msg" id="save-msg">入力内容を確認して「保存する」を押してください。</span>
+  <button class="btn btn--save" onclick="handleSave()">保存する</button>
+</div>
+
+<!-- トースト -->
+<div class="toast" id="toast"></div>
+
+
+<script>
+// ─────────────────────────────────────────────────────────────
+//  タブ切り替え
+// ─────────────────────────────────────────────────────────────
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('is-active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('is-active'));
+  document.getElementById('tab-' + name).classList.add('is-active');
+  btn.classList.add('is-active');
+}
+
+// ─────────────────────────────────────────────────────────────
+//  カラーピッカー同期
+// ─────────────────────────────────────────────────────────────
+function syncColor(picker, textId) {
+  document.getElementById(textId).value = picker.value;
+}
+function syncPicker(input, pickerId) {
+  const v = input.value.trim();
+  if (/^#[0-9A-Fa-f]{6}$/.test(v)) {
+    document.getElementById(pickerId).value = v;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+//  FAQ 動的追加・削除
+// ─────────────────────────────────────────────────────────────
+let faqCount = 0;
+
+function addFaq(q, a) {
+  faqCount++;
+  const n = faqCount;
+  const list = document.getElementById('faq-list');
+  const item = document.createElement('div');
+  item.className = 'faq-item';
+  item.id = `faq-${n}`;
+  item.innerHTML = `
+    <div class="faq-item__head">
+      <span>Q&amp;A ${n}</span>
+      <button class="btn-text" type="button" onclick="removeFaq(${n})">削除</button>
+    </div>
+    <div class="faq-item__body">
+      <div class="field">
+        <label>質問</label>
+        <textarea id="faq_q_${n}" placeholder="例: 敏感肌でも使えますか？">${q || ''}</textarea>
+      </div>
+      <div class="field">
+        <label>回答</label>
+        <textarea id="faq_a_${n}" placeholder="例: すべての方に刺激が起こらないわけではありません。肌の状態に合わせてご使用ください。">${a || ''}</textarea>
+      </div>
+    </div>`;
+  list.appendChild(item);
+}
+
+function removeFaq(n) {
+  const el = document.getElementById(`faq-${n}`);
+  if (el) el.remove();
+}
+
+// ─────────────────────────────────────────────────────────────
+//  フォーム → データ取得
+// ─────────────────────────────────────────────────────────────
+function getChecked(name) {
+  return [...document.querySelectorAll(`input[name="${name}"]:checked`)].map(el => el.value);
+}
+
+function getRadio(name) {
+  const el = document.querySelector(`input[name="${name}"]:checked`);
+  return el ? el.value : '';
+}
+
+function getFaqs() {
+  const faqs = [];
+  document.querySelectorAll('.faq-item').forEach(item => {
+    const id = item.id.replace('faq-', '');
+    const q = (document.getElementById(`faq_q_${id}`) || {}).value || '';
+    const a = (document.getElementById(`faq_a_${id}`) || {}).value || '';
+    if (q || a) faqs.push({ q: q.trim(), a: a.trim() });
+  });
+  return faqs;
+}
+
+function collectBrandVars() {
+  return {
+    brand_name:         val('brand_name'),
+    brand_tagline:      val('brand_tagline'),
+    product_name:       val('product_name'),
+    product_tagline:    val('product_tagline'),
+    category:           val('category'),
+    target_audience:    val('target_audience'),
+    lp_goal:            val('lp_goal'),
+    campaign_type:      val('campaign_type'),
+    brand_tone:         getChecked('brand_tone').join(', '),
+    hero_style:         getRadio('hero_style'),
+    cta_style:          getRadio('cta_style'),
+    font_style:         getRadio('font_style'),
+    price_band:         val('price_band'),
+    price_display:      val('price_display'),
+    offer_details:      val('offer_details'),
+    main_color:         val('main_color'),
+    accent_color:       val('accent_color'),
+    base_bg_color:      val('base_bg_color'),
+    hero_bg_style:      val('hero_bg_style'),
+    cta_label:          val('cta_label'),
+    cta_sub_label:      val('cta_sub_label'),
+    visual_keywords:    val('visual_keywords'),
+    trust_elements:     getChecked('trust_elements'),
+    guarantee_text:     val('guarantee_text'),
+    sns_platforms:      getChecked('sns_platforms'),
+    structure_template: getRadio('structure_template'),
+    form_fields:        getChecked('form_fields'),
+    form_submit_label:  val('form_submit_label'),
+    legal_notes:        val('legal_notes'),
+    layout_width:       getRadio('layout_width'),
+    section_spacing:    getRadio('section_spacing'),
+  };
+}
+
+function collectContentData() {
+  return {
+    product_overview:  val('product_overview'),
+    target_concerns:   val('target_concerns'),
+    benefits:          val('benefits'),
+    features:          val('features'),
+    offer:             val('offer'),
+    cta_note:          val('cta_note'),
+    faqs:              getFaqs(),
+    reviews:           val('reviews'),
+    hero_image:        val('hero_image'),
+    product_image:     val('product_image'),
+    sns_images:        val('sns_images'),
+    legal_disclaimers: val('legal_disclaimers'),
+  };
+}
+
+function val(id) {
+  const el = document.getElementById(id);
+  return el ? el.value.trim() : '';
+}
+
+// ─────────────────────────────────────────────────────────────
+//  データ → フォームへ反映
+// ─────────────────────────────────────────────────────────────
+function populateBrandVars(b) {
+  setVal('brand_name',        b.brand_name);
+  setVal('brand_tagline',     b.brand_tagline);
+  setVal('product_name',      b.product_name);
+  setVal('product_tagline',   b.product_tagline);
+  setSelect('category',       b.category);
+  setVal('target_audience',   b.target_audience);
+  setSelect('lp_goal',        b.lp_goal);
+  setSelect('campaign_type',  b.campaign_type);
+  setVal('guarantee_text',    b.guarantee_text);
+  setVal('price_display',     b.price_display);
+  setVal('offer_details',     b.offer_details);
+  setVal('cta_label',         b.cta_label);
+  setVal('cta_sub_label',     b.cta_sub_label);
+  setVal('form_submit_label', b.form_submit_label);
+  setSelect('price_band',     b.price_band);
+  setSelect('hero_bg_style',  b.hero_bg_style);
+
+  // カラー
+  setColorField('main_color',     b.main_color);
+  setColorField('accent_color',   b.accent_color);
+  setColorField('base_bg_color',  b.base_bg_color);
+
+  // visual_keywords (配列 → 改行区切り)
+  const vk = Array.isArray(b.visual_keywords) ? b.visual_keywords.join('\n') : (b.visual_keywords || '');
+  setVal('visual_keywords', vk);
+
+  // legal_notes (配列 → 改行区切り)
+  const ln = Array.isArray(b.legal_notes) ? b.legal_notes.join('\n') : (b.legal_notes || '');
+  setVal('legal_notes', ln);
+
+  // brand_tone (カンマ区切り文字列 or 配列)
+  const tones = Array.isArray(b.brand_tone)
+    ? b.brand_tone
+    : (b.brand_tone || '').split(',').map(s => s.trim()).filter(Boolean);
+  setChecks('brand_tone', tones);
+
+  // trust_elements / sns_platforms / form_fields (配列)
+  setChecks('trust_elements', b.trust_elements || []);
+  setChecks('sns_platforms',  b.sns_platforms  || []);
+  setChecks('form_fields',    b.form_fields    || []);
+
+  // radio
+  setRadio('hero_style',         b.hero_style);
+  setRadio('cta_style',          b.cta_style);
+  setRadio('font_style',         b.font_style);
+  setRadio('structure_template', b.structure_template);
+  setRadio('layout_width',       b.layout_width);
+  setRadio('section_spacing',    b.section_spacing);
+}
+
+function populateContentData(c) {
+  setVal('product_overview',  c.product_overview);
+  setVal('target_concerns',   c.target_concerns);
+  setVal('benefits',          c.benefits);
+  setVal('features',          c.features);
+  setVal('offer',             c.offer);
+  setVal('cta_note',          c.cta_note);
+  setVal('reviews',           c.reviews);
+  setVal('hero_image',        c.hero_image === 'なし' ? '' : c.hero_image);
+  setVal('product_image',     c.product_image === 'なし' ? '' : c.product_image);
+  setVal('sns_images',        c.sns_images === 'なし' ? '' : c.sns_images);
+  setVal('legal_disclaimers', c.legal_disclaimers);
+
+  // FAQ
+  document.getElementById('faq-list').innerHTML = '';
+  faqCount = 0;
+  const faqs = c.faqs || [];
+  if (faqs.length === 0) faqs.push({ q: '', a: '' });
+  faqs.forEach(f => addFaq(f.q, f.a));
+}
+
+function setVal(id, v) {
+  const el = document.getElementById(id);
+  if (el && v != null) el.value = v;
+}
+function setSelect(id, v) {
+  const el = document.getElementById(id);
+  if (el && v) el.value = v;
+}
+function setRadio(name, v) {
+  if (!v) return;
+  const el = document.querySelector(`input[name="${name}"][value="${v}"]`);
+  if (el) el.checked = true;
+}
+function setChecks(name, vals) {
+  document.querySelectorAll(`input[name="${name}"]`).forEach(el => {
+    el.checked = vals.includes(el.value);
+  });
+}
+function setColorField(fieldId, v) {
+  if (!v) return;
+  setVal(fieldId, v);
+  const picker = document.getElementById(fieldId + '_picker');
+  if (picker && /^#[0-9A-Fa-f]{6}$/.test(v)) picker.value = v;
+}
+
+// ─────────────────────────────────────────────────────────────
+//  API: 読み込み / 保存
+// ─────────────────────────────────────────────────────────────
+async function handleLoad() {
+  setMsg('読み込み中...');
+  try {
+    const res = await fetch('/api/load');
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    populateBrandVars(data.brandVars || {});
+    populateContentData(data.contentData || {});
+    setMsg('ファイルを読み込みました。');
+    toast('読み込み完了', 'ok');
+  } catch (e) {
+    setMsg('読み込みエラー: ' + e.message);
+    toast('読み込みに失敗しました', 'err');
+  }
+}
+
+async function handleSave() {
+  const btn = document.getElementById('save-btn');
+  btn.disabled = true;
+  setMsg('保存中...');
+  try {
+    const body = {
+      brandVars:   collectBrandVars(),
+      contentData: collectContentData(),
+    };
+    const res = await fetch('/api/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json();
+    if (!res.ok || data.error) throw new Error(data.error || 'サーバーエラー');
+    setMsg('保存しました — input/brand-vars.json と input/content-input.md を更新しました。');
+    toast('保存しました ✓', 'ok');
+  } catch (e) {
+    setMsg('保存エラー: ' + e.message);
+    toast('保存に失敗しました', 'err');
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function setMsg(text) {
+  const el = document.getElementById('save-msg');
+  if (el) el.textContent = text;
+}
+
+let toastTimer;
+function toast(msg, type) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = `toast toast--${type} show`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
+}
+
+// ─────────────────────────────────────────────────────────────
+//  初期化
+// ─────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  // FAQ を最低1問追加
+  addFaq();
+  // 既存ファイルを読み込む
+  handleLoad();
+});
+</script>
+</body>
+</html>

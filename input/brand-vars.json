@@ -1,0 +1,53 @@
+{
+  "brand_name": "finesse",
+  "brand_tagline": "",
+  "product_name": "究極のガトーショコラ",
+  "product_tagline": "今までにない上質な体験。",
+  "category": "food",
+  "target_audience": "20代女性、ギフト用途や自分へのご褒美にちょっといいお菓子を買う人",
+  "lp_goal": "purchase",
+  "campaign_type": "launch",
+  "brand_tone": "premium, warm",
+  "hero_style": "bold",
+  "cta_style": "soft",
+  "font_style": "sans",
+  "price_band": "mid",
+  "price_display": "¥3,500（税込）",
+  "offer_details": "初回限定 20%OFF・送料無料",
+  "main_color": "#a18072",
+  "accent_color": "#62555f",
+  "base_bg_color": "#e1e0df",
+  "hero_bg_style": "solid",
+  "cta_label": "初回限定で購入する",
+  "cta_sub_label": "商品を詳しく見る",
+  "visual_keywords": [
+    "高級感",
+    "上質",
+    "美味",
+    "おいしそう"
+  ],
+  "trust_elements": [
+    "レビュー",
+    "SNS掲載",
+    "返金保証"
+  ],
+  "guarantee_text": "初めてご購入いただいて肌に合わなかった場合、所定の条件のもとご返金対応いたします。",
+  "sns_platforms": [
+    "Instagram",
+    "X（旧Twitter）"
+  ],
+  "structure_template": "offer",
+  "form_fields": [
+    "氏名",
+    "メールアドレス",
+    "住所",
+    "電話番号"
+  ],
+  "form_submit_label": "内容を確認して申し込む",
+  "legal_notes": [
+    "効果効能を断定しないこと",
+    "誇大表現を避けること"
+  ],
+  "layout_width": "standard",
+  "section_spacing": "large"
+}
