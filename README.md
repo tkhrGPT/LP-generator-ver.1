@@ -13,7 +13,7 @@
 
 ```bash
 lsof -ti:3000 | xargs kill -9 2>/dev/null
-cd ~/lp-generator
+cd ~/LP-generator-ver.1-main
 node ui/server.js
 ```
 
