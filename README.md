@@ -4,7 +4,31 @@
 2つのファイルに情報を入力して Claude Code に指示するだけで、HTML 形式のLPが生成されます。
 
 ---
+README か配布文に入れる説明文
+起動方法
 
+このツールはローカルで動きます。
+使うときはターミナルで以下を実行してください。
+
+lsof -ti:3000 | xargs kill -9 2>/dev/null
+cd ~/lp-generator
+node ui/server.js
+
+起動に成功すると、以下のように表示されます。
+
+✓ LP Generator UI が起動しました
+→ ブラウザで開く: http://localhost:3000
+
+停止するには Ctrl+C を押してください
+
+その後、ブラウザで以下を開いて使います。
+
+http://localhost:3000
+停止方法
+
+サーバーを止めるときは、ターミナルで Ctrl + C を押してください。
+
+---
 ## はじめての方へ — まず3ステップで動かす
 
 **ステップ 1｜`input/brand-vars.json` を開いて書き換える**
