@@ -15,10 +15,14 @@
 lsof -ti:3000 | xargs kill -9 2>/dev/null
 cd ~/lp-generator
 node ui/server.js
+```
 
 起動に成功すると、以下のように表示されます。
+
+```
 ✓ LP Generator UI が起動しました
 → ブラウザで開く: http://localhost:3000
+```
 
 停止するには Ctrl+C を押してください
 
