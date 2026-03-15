@@ -3,20 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LP ジェネレーター — 設定フォーム</title>
+  <title>LP作成ツール</title>
   <style>
     :root {
-      --bg:       #FFFDFC;
+      --bg:       #F6F5F3;
       --surface:  #FFFFFF;
-      --border:   #E4DCDA;
-      --text:     #2E2A29;
-      --muted:    #7A706D;
-      --accent:   #2E2A29;
-      --pink:     #F3E7E2;
-      --green:    #2A6E52;
+      --border:   #DDD9D7;
+      --text:     #1A1A1A;
+      --muted:    #6B6560;
+      --accent:   #1A3A5C;
+      --green:    #1E6E45;
+      --green-bg: #EBF7F2;
       --red:      #B94040;
-      --radius:   4px;
-      --max-w:    780px;
+      --red-bg:   #FDF0F0;
+      --blue:     #1D4ED8;
+      --blue-bg:  #EFF6FF;
+      --purple:   #6D28D9;
+      --purple-bg:#F5F3FF;
+      --orange:   #B45309;
+      --orange-bg:#FFFBEB;
+      --radius:   6px;
+      --radius-lg:10px;
+      --max-w:    760px;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -27,308 +35,428 @@
       font-family: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Meiryo', sans-serif;
       font-size: 14px;
       line-height: 1.7;
+      min-height: 100vh;
     }
 
     /* ── ヘッダー ── */
     .app-header {
-      position: sticky;
-      top: 0;
-      z-index: 100;
+      position: sticky; top: 0; z-index: 200;
       background: var(--accent);
       color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      display: flex; align-items: center; justify-content: space-between;
       padding: 0 24px;
-      height: 52px;
+      height: 50px;
     }
-    .app-header__title { font-size: 14px; letter-spacing: 0.08em; }
-    .app-header__actions { display: flex; gap: 8px; }
+    .app-header__title { font-size: 13px; font-weight: 600; letter-spacing: 0.06em; }
+    .app-header__sub { font-size: 11px; opacity: 0.6; margin-left: 10px; }
 
-    /* ── タブ ── */
+    /* ── タブナビ ── */
     .tab-nav {
+      position: sticky; top: 50px; z-index: 100;
       display: flex;
-      border-bottom: 2px solid var(--border);
       background: var(--surface);
+      border-bottom: 2px solid var(--border);
       padding: 0 24px;
+      overflow-x: auto;
     }
     .tab-btn {
-      padding: 14px 20px;
-      font-size: 13px;
-      font-family: inherit;
-      background: none;
-      border: none;
+      flex-shrink: 0;
+      padding: 14px 18px;
+      font-size: 13px; font-family: inherit; font-weight: 500;
+      background: none; border: none; cursor: pointer;
+      color: var(--muted);
       border-bottom: 2px solid transparent;
       margin-bottom: -2px;
-      cursor: pointer;
-      color: var(--muted);
-      letter-spacing: 0.04em;
       transition: color 0.15s, border-color 0.15s;
+      white-space: nowrap;
     }
-    .tab-btn.is-active {
-      color: var(--accent);
-      border-bottom-color: var(--accent);
-      font-weight: bold;
+    .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .tab-btn:hover:not(.active) { color: var(--text); }
+    .tab-num {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: var(--border); color: var(--muted);
+      font-size: 10px; font-weight: 700; margin-right: 6px;
     }
+    .tab-btn.active .tab-num { background: var(--accent); color: #fff; }
 
-    /* ── タブパネル ── */
-    .tab-panel { display: none; }
-    .tab-panel.is-active { display: block; }
+    /* ── タブコンテンツ ── */
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; }
 
-    /* ── コンテナ ── */
-    .form-wrap {
+    .tab-body {
       max-width: var(--max-w);
       margin: 0 auto;
-      padding: 32px 24px 120px;
+      padding: 28px 24px 120px;
     }
 
-    /* ── セクション ── */
-    .form-section {
-      margin-bottom: 40px;
+    /* ── セクションブロック ── */
+    .section-block {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
-    }
-    .form-section__header {
-      padding: 14px 20px;
-      background: var(--pink);
-      border-bottom: 1px solid var(--border);
-      font-size: 12px;
-      font-weight: bold;
-      letter-spacing: 0.1em;
-      color: var(--muted);
-      text-transform: uppercase;
-    }
-    .form-section__body {
+      border-radius: var(--radius-lg);
       padding: 20px;
-      display: grid;
-      gap: 18px;
+      margin-bottom: 16px;
     }
-    .form-section__body.cols-2 {
-      grid-template-columns: 1fr 1fr;
+    .section-block__head {
+      display: flex; align-items: baseline; gap: 8px;
+      margin-bottom: 14px;
     }
-    @media (max-width: 560px) {
-      .form-section__body.cols-2 { grid-template-columns: 1fr; }
+    .section-block__title {
+      font-size: 13px; font-weight: 700; color: var(--text);
     }
+    .badge {
+      display: inline-block;
+      font-size: 10px; font-weight: 700;
+      padding: 1px 6px; border-radius: 3px;
+      letter-spacing: 0.04em;
+    }
+    .badge--required { background: #FEE2E2; color: var(--red); }
+    .badge--optional { background: #F0FDF4; color: var(--green); }
+    .badge--ai { background: var(--purple-bg); color: var(--purple); }
+    .section-block__desc { font-size: 12px; color: var(--muted); margin-bottom: 14px; }
 
-    /* ── フォーム要素 ── */
-    .field { display: grid; gap: 5px; }
-    .field.span-2 { grid-column: 1 / -1; }
+    /* ── フォーム部品 ── */
+    .field { margin-bottom: 14px; }
+    .field:last-child { margin-bottom: 0; }
 
     label {
-      font-size: 12px;
-      font-weight: bold;
-      color: var(--text);
-      letter-spacing: 0.03em;
+      display: block;
+      font-size: 12px; font-weight: 600; color: var(--text);
+      margin-bottom: 5px;
     }
-    .field-hint {
-      font-size: 11px;
-      color: var(--muted);
-      line-height: 1.6;
+    label .hint {
+      font-weight: 400; color: var(--muted); margin-left: 6px;
     }
 
     input[type="text"],
-    input[type="url"],
-    textarea,
-    select {
+    input[type="color"],
+    select,
+    textarea {
       width: 100%;
-      padding: 9px 12px;
-      font-size: 13px;
-      font-family: inherit;
+      font-family: inherit; font-size: 13px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
       color: var(--text);
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    input[type="text"], select { padding: 9px 11px; height: 38px; }
+    textarea { padding: 9px 11px; resize: vertical; min-height: 90px; }
+    input:focus, select:focus, textarea:focus {
       outline: none;
-      transition: border-color 0.15s;
-      -webkit-appearance: none;
-      appearance: none;
-    }
-    input[type="text"]:focus,
-    input[type="url"]:focus,
-    textarea:focus,
-    select:focus {
       border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(26,58,92,0.08);
     }
-    textarea { resize: vertical; min-height: 90px; }
-    select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M0 0l6 8 6-8z' fill='%237A706D'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; cursor: pointer; }
 
-    /* カラーピッカー */
+    .field-row { display: grid; gap: 12px; }
+    .field-row--2 { grid-template-columns: 1fr 1fr; }
+    .field-row--3 { grid-template-columns: 1fr 1fr 1fr; }
+
     .color-field {
-      display: flex;
-      gap: 8px;
-      align-items: center;
+      display: flex; align-items: center; gap: 8px;
     }
-    input[type="color"] {
-      width: 40px;
-      height: 38px;
-      padding: 2px;
+    .color-field input[type="color"] {
+      width: 38px; height: 38px; padding: 2px; cursor: pointer;
+    }
+    .color-field input[type="text"] { flex: 1; }
+
+    .select-wrap { position: relative; }
+    .select-wrap select { appearance: none; padding-right: 28px; }
+    .select-wrap::after {
+      content: '▾';
+      position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+      color: var(--muted); pointer-events: none; font-size: 11px;
+    }
+
+    /* ── <details> 折りたたみ ── */
+    details.adv {
       border: 1px solid var(--border);
       border-radius: var(--radius);
+      margin-top: 12px;
+      overflow: hidden;
+    }
+    details.adv summary {
+      padding: 10px 14px;
+      font-size: 12px; font-weight: 600;
+      cursor: pointer; list-style: none;
+      display: flex; align-items: center; gap: 6px;
+      color: var(--muted);
       background: var(--bg);
-      cursor: pointer;
-      flex-shrink: 0;
+    }
+    details.adv summary::-webkit-details-marker { display: none; }
+    details.adv summary::before {
+      content: '▶'; font-size: 9px;
+      transition: transform 0.2s;
+    }
+    details.adv[open] summary::before { transform: rotate(90deg); }
+    details.adv .adv-body {
+      padding: 16px 14px;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
     }
 
-    /* ラジオ・チェックボックスグループ */
-    .check-group {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
+    /* ── AIパネル ── */
+    .ai-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--purple-bg);
+      border: 1px solid #C4B5FD;
+      border-radius: var(--radius);
+      padding: 10px 14px;
+      margin-bottom: 16px;
+      gap: 12px;
     }
-    .check-label {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      padding: 6px 12px;
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      cursor: pointer;
+    .ai-bar__text { font-size: 12px; color: var(--purple); flex: 1; }
+    .ai-bar__text strong { font-weight: 700; }
+
+    .ai-tone-panel {
+      background: var(--purple-bg);
+      border: 1px solid #C4B5FD;
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    .ai-tone-panel__title {
+      font-size: 13px; font-weight: 700; color: var(--purple);
+      margin-bottom: 4px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .ai-tone-panel__desc { font-size: 12px; color: #5B21B6; margin-bottom: 12px; }
+    .ai-tone-result {
+      display: none;
+      background: #fff;
+      border: 1px solid #C4B5FD;
+      border-radius: var(--radius);
+      padding: 12px;
+      margin-top: 10px;
       font-size: 12px;
       color: var(--text);
-      transition: background 0.12s, border-color 0.12s;
-      user-select: none;
     }
-    .check-label input { position: absolute; opacity: 0; width: 0; height: 0; }
-    .check-label:has(input:checked) {
-      background: var(--accent);
-      color: #fff;
-      border-color: var(--accent);
+    .ai-tone-result.show { display: block; }
+    .ai-tone-result__row {
+      display: flex; gap: 8px; align-items: baseline;
+      padding: 4px 0;
+      border-bottom: 1px solid #EDE9FE;
     }
+    .ai-tone-result__row:last-child { border-bottom: none; }
+    .ai-tone-result__label { font-weight: 700; color: var(--purple); min-width: 90px; }
+    .ai-tone-result__val { color: var(--text); }
 
-    /* ── FAQ動的リスト ── */
-    .faq-list { display: grid; gap: 12px; }
-    .faq-item {
+    .btn-ai {
+      flex-shrink: 0;
+      padding: 6px 14px;
+      font-size: 12px; font-weight: 600; font-family: inherit;
+      background: var(--purple); color: #fff;
+      border: none; border-radius: var(--radius);
+      cursor: pointer;
+      transition: opacity 0.15s;
+      white-space: nowrap;
+    }
+    .btn-ai:hover { opacity: 0.85; }
+    .btn-ai:disabled { opacity: 0.5; cursor: default; }
+    .btn-ai--outline {
+      background: transparent;
+      color: var(--purple);
+      border: 1px solid var(--purple);
+    }
+    .btn-ai--outline:hover { background: var(--purple-bg); }
+
+    /* ── レビューカード ── */
+    .review-cards { display: flex; flex-direction: column; gap: 12px; }
+    .review-card {
       border: 1px solid var(--border);
       border-radius: var(--radius);
       overflow: hidden;
     }
-    .faq-item__head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+    .review-card__head {
+      background: var(--bg);
       padding: 8px 12px;
-      background: var(--pink);
-      font-size: 11px;
-      font-weight: bold;
-      letter-spacing: 0.08em;
-      color: var(--muted);
+      font-size: 11px; font-weight: 700; color: var(--muted);
+      border-bottom: 1px solid var(--border);
     }
-    .faq-item__body {
-      padding: 12px;
-      display: grid;
-      gap: 8px;
-    }
-    .faq-item__body textarea { min-height: 60px; }
+    .review-card__body { padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+    .review-card__body textarea { min-height: 70px; }
 
-    .btn-text {
-      background: none;
-      border: none;
+    /* ── 画像アップロード ── */
+    .upload-zone {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      text-align: center;
       cursor: pointer;
-      font-size: 12px;
-      font-family: inherit;
-      color: var(--muted);
-      padding: 2px 6px;
-      border-radius: 2px;
+      transition: border-color 0.2s, background 0.2s;
+      margin-bottom: 8px;
+      position: relative;
     }
-    .btn-text:hover { color: var(--red); }
-    .btn-add {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      padding: 8px 14px;
-      background: none;
-      border: 1px dashed var(--border);
-      border-radius: var(--radius);
-      cursor: pointer;
-      font-size: 12px;
-      font-family: inherit;
-      color: var(--muted);
-      width: 100%;
-      transition: border-color 0.12s, color 0.12s;
+    .upload-zone.drag-over { border-color: var(--accent); background: #EFF6FF; }
+    .upload-zone__icon { font-size: 22px; margin-bottom: 4px; }
+    .upload-zone__label { font-size: 13px; font-weight: 600; color: var(--accent); }
+    .upload-zone__sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .upload-zone input[type="file"] {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer;
     }
-    .btn-add:hover { border-color: var(--accent); color: var(--accent); }
 
-    /* ── ボタン ── */
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      padding: 0 20px;
-      height: 38px;
+    .upload-section {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+    .upload-section__head {
+      background: var(--bg);
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .upload-section__icon { font-size: 16px; }
+    .upload-section__title { font-size: 12px; font-weight: 700; color: var(--text); }
+    .upload-section__hint { font-size: 11px; color: var(--muted); margin-left: auto; }
+    .upload-section__body { padding: 12px; }
+
+    .image-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; margin-top: 8px; }
+    .image-card {
+      border: 1px solid var(--border); border-radius: var(--radius);
+      overflow: hidden; background: var(--bg); position: relative;
+    }
+    .image-card__thumb {
+      width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block;
+    }
+    .image-card__info { padding: 5px 7px; }
+    .image-card__name { font-size: 10px; color: var(--text); word-break: break-all; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+    .image-card__del {
+      position: absolute; top: 4px; right: 4px;
+      width: 20px; height: 20px;
+      background: rgba(0,0,0,0.5); color: #fff;
+      border: none; border-radius: 50%; cursor: pointer;
+      font-size: 11px; display: flex; align-items: center; justify-content: center;
+    }
+    .image-card__del:hover { background: var(--red); }
+
+    /* ── LP生成タブ ── */
+    .gen-tab { padding: 28px 24px 40px; max-width: var(--max-w); margin: 0 auto; }
+
+    .generate-checklist {
+      list-style: none;
+      margin-bottom: 20px;
+    }
+    .generate-checklist li {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
       font-size: 13px;
-      font-family: inherit;
-      letter-spacing: 0.05em;
-      border-radius: var(--radius);
-      cursor: pointer;
-      border: 1px solid transparent;
-      transition: all 0.15s;
     }
-    .btn--primary {
-      background: var(--surface);
-      color: var(--accent);
-      border-color: var(--border);
-    }
-    .btn--primary:hover { border-color: var(--accent); }
-    .btn--save {
-      background: var(--green);
-      color: #fff;
-      border-color: var(--green);
-    }
-    .btn--save:hover { opacity: 0.88; }
-    .btn--save:disabled { opacity: 0.5; cursor: not-allowed; }
+    .generate-checklist li:last-child { border-bottom: none; }
+    .check-icon { font-size: 16px; }
 
-    /* ── 固定保存バー ── */
-    .save-bar {
-      position: fixed;
-      bottom: 0;
-      left: 0;
+    .btn-generate {
       width: 100%;
-      background: rgba(255,253,252,0.95);
-      backdrop-filter: blur(6px);
-      border-top: 1px solid var(--border);
+      padding: 16px;
+      font-size: 15px; font-weight: 700; font-family: inherit;
+      background: var(--green); color: #fff;
+      border: none; border-radius: var(--radius-lg);
+      cursor: pointer;
+      transition: opacity 0.15s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-generate:hover { opacity: 0.9; }
+    .btn-generate:disabled { opacity: 0.5; cursor: default; }
+
+    .generate-success {
+      display: none;
+      background: var(--green-bg);
+      border: 1px solid #86EFAC;
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      margin-top: 16px;
+    }
+    .generate-success.show { display: block; }
+    .generate-success__title { font-size: 14px; font-weight: 700; color: var(--green); margin-bottom: 12px; }
+
+    .step-list { list-style: none; }
+    .step-item {
+      display: flex; gap: 12px;
+      padding: 10px 0; border-bottom: 1px solid #BBF7D0;
+    }
+    .step-item:last-child { border-bottom: none; }
+    .step-num {
+      flex-shrink: 0;
+      width: 22px; height: 22px; border-radius: 50%;
+      background: var(--green); color: #fff;
+      font-size: 11px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      margin-top: 1px;
+    }
+    .step-text { font-size: 12px; color: #166534; }
+    .step-text strong { font-weight: 700; }
+
+    .prompt-block {
+      background: #1E293B; color: #E2E8F0;
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      font-family: 'Menlo', 'Monaco', monospace;
+      font-size: 12px; line-height: 1.5;
+      position: relative;
+      margin-top: 10px;
+      white-space: pre-wrap; word-break: break-all;
+    }
+    .copy-btn {
+      position: absolute; top: 10px; right: 10px;
+      padding: 4px 10px;
+      font-size: 11px; font-family: inherit; font-weight: 600;
+      background: rgba(255,255,255,0.15); color: #fff;
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: var(--radius); cursor: pointer;
+      transition: background 0.15s;
+    }
+    .copy-btn:hover { background: rgba(255,255,255,0.25); }
+    .copy-btn.copied { background: var(--green); border-color: var(--green); }
+
+    /* ── 下部 保存バー ── */
+    .save-bar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      z-index: 150;
+      background: var(--accent);
       padding: 12px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      z-index: 90;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 12px;
     }
-    .save-bar__msg {
-      font-size: 12px;
-      color: var(--muted);
+    .save-bar__msg { font-size: 12px; color: rgba(255,255,255,0.7); }
+    .btn-save {
+      flex-shrink: 0;
+      padding: 9px 22px;
+      font-size: 13px; font-weight: 700; font-family: inherit;
+      background: #fff; color: var(--accent);
+      border: none; border-radius: var(--radius);
+      cursor: pointer;
+      transition: opacity 0.15s;
     }
+    .btn-save:hover { opacity: 0.9; }
+    .btn-save:disabled { opacity: 0.5; cursor: default; }
 
     /* ── トースト通知 ── */
-    .toast {
-      position: fixed;
-      bottom: 72px;
-      left: 50%;
-      transform: translateX(-50%) translateY(16px);
-      padding: 10px 20px;
-      border-radius: 20px;
-      font-size: 13px;
-      font-weight: bold;
-      letter-spacing: 0.04em;
-      opacity: 0;
-      transition: opacity 0.2s, transform 0.2s;
-      pointer-events: none;
-      z-index: 200;
+    #toast {
+      position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+      background: #1A1A1A; color: #fff;
+      padding: 10px 18px;
+      border-radius: 999px;
+      font-size: 12px; font-weight: 600;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.3s;
+      z-index: 300;
+      white-space: nowrap;
     }
-    .toast.show {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
-    .toast--ok  { background: var(--green); color: #fff; }
-    .toast--err { background: var(--red);   color: #fff; }
+    #toast.show { opacity: 1; }
 
-    /* ── ローディング ── */
-    .loading {
-      text-align: center;
-      padding: 60px;
-      color: var(--muted);
-      font-size: 13px;
+    /* ── ユーティリティ ── */
+    .text-muted { color: var(--muted); font-size: 12px; }
+    .mt-8 { margin-top: 8px; }
+    .mt-12 { margin-top: 12px; }
+
+    @media (max-width: 600px) {
+      .tab-body { padding: 16px 14px 120px; }
+      .field-row--2, .field-row--3 { grid-template-columns: 1fr; }
+      .save-bar { flex-direction: column; align-items: stretch; }
+      .image-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
     }
   </style>
 </head>
@@ -336,565 +464,1247 @@
 
 <!-- ヘッダー -->
 <header class="app-header">
-  <span class="app-header__title">LP Generator — 設定フォーム</span>
-  <div class="app-header__actions">
-    <button class="btn btn--primary" onclick="handleLoad()">↺ 再読み込み</button>
-    <button class="btn btn--save" id="save-btn" onclick="handleSave()">保存する</button>
+  <div style="display:flex;align-items:baseline">
+    <span class="app-header__title">LP 作成ツール</span>
+    <span class="app-header__sub">最小5項目で生成できます</span>
   </div>
 </header>
 
-<!-- タブ -->
-<nav class="tab-nav">
-  <button class="tab-btn is-active" data-tab="brand" onclick="switchTab('brand', this)">
-    ① ブランド設定
+<!-- タブナビ -->
+<nav class="tab-nav" id="tabNav">
+  <button class="tab-btn active" data-tab="tab-brand" onclick="switchTab(this)">
+    <span class="tab-num">1</span>ブランド情報
   </button>
-  <button class="tab-btn" data-tab="content" onclick="switchTab('content', this)">
-    ② コンテンツ素材
+  <button class="tab-btn" data-tab="tab-content" onclick="switchTab(this)">
+    <span class="tab-num">2</span>コンテンツ
+  </button>
+  <button class="tab-btn" data-tab="tab-images" onclick="switchTab(this)">
+    <span class="tab-num">3</span>画像（任意）
+  </button>
+  <button class="tab-btn" data-tab="tab-generate" onclick="switchTab(this)">
+    <span class="tab-num">4</span>LP生成
   </button>
 </nav>
 
-<!-- ── タブ①: ブランド設定 ── -->
-<div class="tab-panel is-active" id="tab-brand">
-  <div class="form-wrap">
+<!-- ─────────────────── TAB 1: ブランド情報 ─────────────────── -->
+<div id="tab-brand" class="tab-pane active">
+  <div class="tab-body">
 
-    <!-- 基本情報 -->
-    <div class="form-section">
-      <div class="form-section__header">基本情報</div>
-      <div class="form-section__body cols-2">
-        <div class="field">
-          <label>ブランド名</label>
-          <input type="text" id="brand_name" placeholder="例: Lumière">
-        </div>
-        <div class="field">
-          <label>ブランドスローガン <span style="font-weight:normal;color:var(--muted)">（任意）</span></label>
-          <input type="text" id="brand_tagline" placeholder="例: やさしく、静かに、うるおいを。">
-        </div>
-        <div class="field">
-          <label>商品名・サービス名</label>
-          <input type="text" id="product_name" placeholder="例: ルミエール モイストセラム">
-        </div>
-        <div class="field">
-          <label>商品キャッチコピー <span style="font-weight:normal;color:var(--muted)">（任意）</span></label>
-          <input type="text" id="product_tagline" placeholder="例: 乾燥が気になる日も、うるおいを手放さない">
-          <p class="field-hint">ヒーローに表示される短いコピー。空欄だとClaudeが生成します。</p>
-        </div>
+    <!-- 必須5項目 -->
+    <div class="section-block">
+      <div class="section-block__head">
+        <span class="section-block__title">基本情報</span>
+        <span class="badge badge--required">必須</span>
+      </div>
+      <p class="section-block__desc">この5項目だけで生成できます。残りはAIが補います。</p>
+      <div class="field">
+        <label>ブランド名 <span class="hint">（例：SHIFT COACHING）</span></label>
+        <input type="text" id="brand_name" placeholder="あなたのブランド名">
+      </div>
+      <div class="field">
+        <label>商品・サービス名 <span class="hint">（例：AIシフト 6週間コーチングプログラム）</span></label>
+        <input type="text" id="product_name" placeholder="商品名またはサービス名">
+      </div>
+      <div class="field-row field-row--2">
         <div class="field">
           <label>商材カテゴリ</label>
-          <select id="category">
-            <option value="cosmetics">cosmetics — 化粧品・美容液・スキンケア</option>
-            <option value="supplement">supplement — サプリ・健康食品</option>
-            <option value="apparel">apparel — 衣類・ファッション</option>
-            <option value="course">course — 講座・教材・書籍</option>
-            <option value="app">app — アプリ・デジタルサービス</option>
-            <option value="food">food — 食品・飲料</option>
-            <option value="other">other — その他</option>
-          </select>
-          <p class="field-hint">デザインの余白・フォント・雰囲気に影響します。</p>
+          <div class="select-wrap">
+            <select id="category" onchange="onCategoryChange()">
+              <option value="course">コース・講座・コーチング</option>
+              <option value="cosmetics">化粧品・美容</option>
+              <option value="supplement">サプリメント・健康食品</option>
+              <option value="apparel">アパレル・ファッション</option>
+              <option value="app">アプリ・デジタルサービス</option>
+              <option value="food">食品・飲料</option>
+              <option value="other">その他</option>
+            </select>
+          </div>
         </div>
         <div class="field">
           <label>LPのゴール</label>
-          <select id="lp_goal">
-            <option value="purchase">purchase — 商品購入</option>
-            <option value="lead">lead — 問い合わせ・資料請求</option>
-            <option value="trial">trial — 無料体験・サンプル申し込み</option>
-            <option value="signup">signup — 会員登録・LINE登録</option>
-          </select>
+          <div class="select-wrap">
+            <select id="lp_goal" onchange="onGoalChange()">
+              <option value="trial">無料体験・トライアル申し込み</option>
+              <option value="purchase">購入・決済</option>
+              <option value="inquiry">問い合わせ・資料請求</option>
+              <option value="line">LINE登録</option>
+            </select>
+          </div>
         </div>
-        <div class="field span-2">
-          <label>ターゲット像</label>
-          <input type="text" id="target_audience" placeholder="例: 30代女性、乾燥肌・敏感肌寄り、忙しくてもスキンケアはちゃんとしたい人">
-          <p class="field-hint">年代・性別・悩み・ライフスタイルを具体的に書くほど、Claudeのコピーが的確になります。</p>
-        </div>
-        <div class="field">
-          <label>キャンペーン種別</label>
-          <select id="campaign_type">
-            <option value="new_customer">new_customer — 新規顧客獲得</option>
-            <option value="repeat">repeat — リピーター向け</option>
-            <option value="seasonal">seasonal — 季節キャンペーン</option>
-            <option value="launch">launch — 新発売</option>
-          </select>
-        </div>
+      </div>
+      <div class="field">
+        <label>CTAボタンのテキスト <span class="hint">（例：無料セッションを予約する）</span></label>
+        <input type="text" id="cta_label" placeholder="無料セッションを予約する / 今すぐ購入する">
       </div>
     </div>
 
-    <!-- デザイントーン -->
-    <div class="form-section">
-      <div class="form-section__header">デザイントーン</div>
-      <div class="form-section__body">
-
-        <div class="field">
-          <label>ブランドのトーン <span style="font-weight:normal;color:var(--muted)">（複数選択可）</span></label>
-          <p class="field-hint">選んだキーワードの組み合わせがデザインの雰囲気になります。</p>
-          <div class="check-group" id="brand_tone_group">
-            <label class="check-label"><input type="checkbox" name="brand_tone" value="clean"> clean（清潔感・シンプル）</label>
-            <label class="check-label"><input type="checkbox" name="brand_tone" value="premium"> premium（上質・高級感）</label>
-            <label class="check-label"><input type="checkbox" name="brand_tone" value="energetic"> energetic（活気・鮮やか）</label>
-            <label class="check-label"><input type="checkbox" name="brand_tone" value="playful"> playful（楽しい・明るい）</label>
-            <label class="check-label"><input type="checkbox" name="brand_tone" value="bold"> bold（力強い・インパクト）</label>
-            <label class="check-label"><input type="checkbox" name="brand_tone" value="warm"> warm（温かい・やわらかい）</label>
-            <label class="check-label"><input type="checkbox" name="brand_tone" value="reassuring"> reassuring（安心感・信頼）</label>
-          </div>
-        </div>
-
-        <div class="field">
-          <label>ファーストビューのスタイル</label>
-          <div class="check-group">
-            <label class="check-label"><input type="radio" name="hero_style" value="emotional" checked> emotional（悩みに寄り添う共感訴求）</label>
-            <label class="check-label"><input type="radio" name="hero_style" value="bold"> bold（商品・コピーを力強く前面に）</label>
-            <label class="check-label"><input type="radio" name="hero_style" value="simple"> simple（シンプル・余白重視）</label>
-          </div>
-        </div>
-
-        <div class="field">
-          <label>CTAボタンの強さ</label>
-          <p class="field-hint">ボタン周辺の言葉選びに影響します。</p>
-          <div class="check-group">
-            <label class="check-label"><input type="radio" name="cta_style" value="soft" checked> soft（やわらかく自然）</label>
-            <label class="check-label"><input type="radio" name="cta_style" value="bold"> bold（行動を強く促す）</label>
-            <label class="check-label"><input type="radio" name="cta_style" value="urgent"> urgent（限定感・緊急性）</label>
-          </div>
-        </div>
-
-        <div class="field">
-          <label>フォントの方向性</label>
-          <div class="check-group">
-            <label class="check-label"><input type="radio" name="font_style" value="serif" checked> serif（明朝系・上質感・高級感）</label>
-            <label class="check-label"><input type="radio" name="font_style" value="sans"> sans（ゴシック系・読みやすさ優先）</label>
-          </div>
-        </div>
-
-        <div class="field">
-          <label>ビジュアルキーワード <span style="font-weight:normal;color:var(--muted)">（改行で区切って3〜6個）</span></label>
-          <textarea id="visual_keywords" rows="3" placeholder="透明感&#10;自然光&#10;清潔感&#10;上質"></textarea>
-          <p class="field-hint">デザインの雰囲気を言葉で表したキーワード。Claudeがグラデーション・余白・装飾を決める際に使います。</p>
-        </div>
-
+    <!-- AIトンマナ補完パネル -->
+    <div class="ai-tone-panel">
+      <div class="ai-tone-panel__title">✦ AIがトンマナを提案します</div>
+      <div class="ai-tone-panel__desc">
+        ターゲットとインサイトを入力すると、AIがブランドトーン・ヒーロー表現・CTA温度感・LP構成を自動で提案します。<br>
+        入力は1〜2行で十分です。空欄でも生成できます。
       </div>
-    </div>
-
-    <!-- カラー -->
-    <div class="form-section">
-      <div class="form-section__header">カラー設定</div>
-      <div class="form-section__body cols-2">
-        <div class="field">
-          <label>メインカラー</label>
-          <div class="color-field">
-            <input type="color" id="main_color_picker" value="#F3E7E2" oninput="syncColor(this,'main_color')">
-            <input type="text"  id="main_color" value="#F3E7E2" placeholder="#F3E7E2" oninput="syncPicker(this,'main_color_picker')" style="font-family:monospace;">
-          </div>
-          <p class="field-hint">セクション背景などに使う淡い色。ブランドカラーの薄い版が馴染みやすい。</p>
-        </div>
-        <div class="field">
-          <label>アクセントカラー</label>
-          <div class="color-field">
-            <input type="color" id="accent_color_picker" value="#2E2A29" oninput="syncColor(this,'accent_color')">
-            <input type="text"  id="accent_color" value="#2E2A29" placeholder="#2E2A29" oninput="syncPicker(this,'accent_color_picker')" style="font-family:monospace;">
-          </div>
-          <p class="field-hint">ボタン・見出し・ボーダーに使うブランドのシグネチャーカラー。</p>
-        </div>
-        <div class="field">
-          <label>背景色（ベース）</label>
-          <div class="color-field">
-            <input type="color" id="base_bg_color_picker" value="#FFFDFC" oninput="syncColor(this,'base_bg_color')">
-            <input type="text"  id="base_bg_color" value="#FFFDFC" placeholder="#FFFDFC" oninput="syncPicker(this,'base_bg_color_picker')" style="font-family:monospace;">
-          </div>
-          <p class="field-hint">ページ全体の地の色。白または白に近い色を推奨。</p>
-        </div>
-        <div class="field">
-          <label>ヒーロー背景スタイル</label>
-          <select id="hero_bg_style">
-            <option value="gradient">gradient（グラデーション・やわらかい）</option>
-            <option value="solid">solid（単色・シンプル）</option>
-            <option value="pattern">pattern（幾何学模様・モダン）</option>
-          </select>
-        </div>
+      <div class="field">
+        <label>ターゲット読者 <span class="hint">（1〜2行でOK）</span></label>
+        <textarea id="target_audience" style="min-height:56px" placeholder="例：AIを業務で使いたい30〜40代のビジネスパーソン。独学を試みたが続かなかった。"></textarea>
       </div>
-    </div>
-
-    <!-- 価格・オファー -->
-    <div class="form-section">
-      <div class="form-section__header">価格・オファー</div>
-      <div class="form-section__body cols-2">
+      <div class="field-row field-row--2">
         <div class="field">
           <label>価格帯</label>
-          <select id="price_band">
-            <option value="low">low — ～¥1,000（衝動買い向き）</option>
-            <option value="mid">mid — ¥1,000〜¥5,000</option>
-            <option value="mid-high" selected>mid-high — ¥5,000〜¥15,000</option>
-            <option value="high">high — ¥15,000〜¥50,000</option>
-            <option value="premium">premium — ¥50,000〜</option>
-          </select>
-          <p class="field-hint">余白量・CTAの強度・コピーのトーンに影響します。</p>
+          <div class="select-wrap">
+            <select id="price_band" onchange="onGoalChange()">
+              <option value="low">低価格（〜5,000円）</option>
+              <option value="mid">中価格（5,000〜30,000円）</option>
+              <option value="high" selected>高価格（30,000円〜）</option>
+            </select>
+          </div>
         </div>
-        <div class="field">
-          <label>表示価格</label>
-          <input type="text" id="price_display" placeholder="例: ¥5,500（税込）">
+        <div class="field" style="display:flex;flex-direction:column;justify-content:flex-end">
+          <button class="btn-ai" id="btnToneInfer" onclick="runToneInfer()" style="height:38px;width:100%">
+            ✦ トンマナを提案してもらう
+          </button>
         </div>
-        <div class="field span-2">
-          <label>オファー・特典</label>
-          <input type="text" id="offer_details" placeholder="例: 初回限定 20%OFF・送料無料">
-        </div>
+      </div>
+
+      <!-- トンマナ提案結果 -->
+      <div class="ai-tone-result" id="toneResult">
+        <div style="font-size:11px;font-weight:700;color:var(--purple);margin-bottom:8px">AIの提案（詳細設定に反映済み・編集できます）</div>
+        <div class="ai-tone-result__row"><span class="ai-tone-result__label">ブランドトーン</span><span class="ai-tone-result__val" id="tr-tone">—</span></div>
+        <div class="ai-tone-result__row"><span class="ai-tone-result__label">ヒーロー表現</span><span class="ai-tone-result__val" id="tr-hero">—</span></div>
+        <div class="ai-tone-result__row"><span class="ai-tone-result__label">CTA温度感</span><span class="ai-tone-result__val" id="tr-cta">—</span></div>
+        <div class="ai-tone-result__row"><span class="ai-tone-result__label">LP構成</span><span class="ai-tone-result__val" id="tr-template">—</span></div>
+        <div class="ai-tone-result__row"><span class="ai-tone-result__label">推奨カラー</span><span class="ai-tone-result__val" id="tr-color">—</span></div>
       </div>
     </div>
 
-    <!-- CTA -->
-    <div class="form-section">
-      <div class="form-section__header">CTA（行動ボタン）</div>
-      <div class="form-section__body cols-2">
+    <!-- 価格・CTA補足 -->
+    <div class="section-block">
+      <div class="section-block__head">
+        <span class="section-block__title">価格・オファー</span>
+        <span class="badge badge--optional">任意</span>
+      </div>
+      <div class="field-row field-row--2">
         <div class="field">
-          <label>メインボタンの文言</label>
-          <input type="text" id="cta_label" placeholder="例: 初回限定で購入する">
-          <p class="field-hint">LP全体で統一して使われます。15文字以内推奨。</p>
+          <label>価格表示 <span class="hint">（例：¥98,000）</span></label>
+          <input type="text" id="price_display" placeholder="¥○○,000（税込）">
         </div>
         <div class="field">
-          <label>サブボタンの文言</label>
-          <input type="text" id="cta_sub_label" placeholder="例: 商品を詳しく見る">
-          <p class="field-hint">ヒーロー下などに置く「まず詳しく見たい人」向けの導線。</p>
+          <label>CTAサブボタン</label>
+          <input type="text" id="cta_sub_label" placeholder="詳しく見る">
         </div>
+      </div>
+      <div class="field">
+        <label>オファー補足 <span class="hint">（例：初回無料・30日返金保証）</span></label>
+        <input type="text" id="offer_details" placeholder="初回セッション無料（通常¥15,000相当）・強引な勧誘なし">
       </div>
     </div>
 
-    <!-- LP構成 -->
-    <div class="form-section">
-      <div class="form-section__header">LP構成テンプレート</div>
-      <div class="form-section__body">
-        <div class="field">
-          <label>構成の流れ</label>
-          <div class="check-group">
-            <label class="check-label"><input type="radio" name="structure_template" value="story" checked> story — 共感→出会い→特徴→信頼→CTA（感情・世界観重視）</label>
-            <label class="check-label"><input type="radio" name="structure_template" value="trust"> trust — 課題→根拠→特徴→レビュー→CTA（信頼性重視）</label>
-            <label class="check-label"><input type="radio" name="structure_template" value="offer"> offer — オファー→メリット→根拠→CTA（割引・特典重視）</label>
+    <!-- 詳細設定（折りたたみ） -->
+    <details class="adv">
+      <summary>詳細設定（スキップ可）</summary>
+      <div class="adv-body">
+        <div class="field-row field-row--2">
+          <div class="field">
+            <label>ブランドキャッチコピー</label>
+            <input type="text" id="brand_tagline" placeholder="AIが当たり前の時代に、一歩先へ">
+          </div>
+          <div class="field">
+            <label>商品キャッチコピー</label>
+            <input type="text" id="product_tagline" placeholder="AIを「知っている」から「使いこなす」へ">
+          </div>
+        </div>
+        <div class="field-row field-row--2">
+          <div class="field">
+            <label>LP構成テンプレート <span class="hint">（AIが自動選択）</span></label>
+            <div class="select-wrap">
+              <select id="structure_template">
+                <option value="story">ストーリー型（共感重視）</option>
+                <option value="trust">実績型（信頼・根拠重視）</option>
+                <option value="offer">オファー型（価格訴求）</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label>CTAスタイル <span class="hint">（AIが自動選択）</span></label>
+            <div class="select-wrap">
+              <select id="cta_style">
+                <option value="soft">ソフト（押しつけない）</option>
+                <option value="bold">ボールド（行動促進）</option>
+                <option value="urgent">緊急（限定・期間）</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="field-row field-row--2">
+          <div class="field">
+            <label>ヒーロースタイル <span class="hint">（AIが自動選択）</span></label>
+            <div class="select-wrap">
+              <select id="hero_style">
+                <option value="emotional">エモーショナル（感情訴求）</option>
+                <option value="proof">実績訴求</option>
+                <option value="product">商品中心</option>
+                <option value="lifestyle">ライフスタイル</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label>デザイントーン <span class="hint">（AIが自動選択）</span></label>
+            <input type="text" id="brand_tone" placeholder="warm, reassuring">
           </div>
         </div>
         <div class="field">
-          <label>コンテンツ幅</label>
-          <div class="check-group">
-            <label class="check-label"><input type="radio" name="layout_width" value="narrow" checked> narrow（〜720px・読み物・美容向き）</label>
-            <label class="check-label"><input type="radio" name="layout_width" value="standard"> standard（〜960px・汎用）</label>
-            <label class="check-label"><input type="radio" name="layout_width" value="wide"> wide（〜1200px・情報量多め）</label>
+          <label>保証・安心テキスト</label>
+          <input type="text" id="guarantee_text" placeholder="初回無料セッションに満足できなければ、そのままご縁なしで大丈夫です。">
+        </div>
+        <div class="field">
+          <label>申し込みフォームの項目 <span class="hint">（1行1項目）</span></label>
+          <textarea id="form_fields_text" style="min-height:60px" placeholder="氏名&#10;メールアドレス&#10;電話番号（任意）"></textarea>
+        </div>
+        <div class="field-row field-row--2">
+          <div class="field">
+            <label>フォーム送信ボタン</label>
+            <input type="text" id="form_submit_label" placeholder="無料セッションを予約する">
           </div>
-        </div>
-        <div class="field">
-          <label>セクション余白</label>
-          <div class="check-group">
-            <label class="check-label"><input type="radio" name="section_spacing" value="compact"> compact（詰め気味）</label>
-            <label class="check-label"><input type="radio" name="section_spacing" value="standard" checked> standard（標準）</label>
-            <label class="check-label"><input type="radio" name="section_spacing" value="large"> large（余白広め・premium向き）</label>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 信頼要素 -->
-    <div class="form-section">
-      <div class="form-section__header">信頼要素</div>
-      <div class="form-section__body">
-        <div class="field">
-          <label>LPに掲載する信頼要素 <span style="font-weight:normal;color:var(--muted)">（複数選択可）</span></label>
-          <div class="check-group">
-            <label class="check-label"><input type="checkbox" name="trust_elements" value="レビュー"> レビュー</label>
-            <label class="check-label"><input type="checkbox" name="trust_elements" value="SNS掲載"> SNS掲載</label>
-            <label class="check-label"><input type="checkbox" name="trust_elements" value="返金保証"> 返金保証</label>
-            <label class="check-label"><input type="checkbox" name="trust_elements" value="専門家監修"> 専門家監修</label>
-            <label class="check-label"><input type="checkbox" name="trust_elements" value="メディア掲載"> メディア掲載</label>
-            <label class="check-label"><input type="checkbox" name="trust_elements" value="認証マーク"> 認証マーク</label>
-            <label class="check-label"><input type="checkbox" name="trust_elements" value="販売実績"> 販売実績</label>
-          </div>
-        </div>
-        <div class="field">
-          <label>返金保証の説明文 <span style="font-weight:normal;color:var(--muted)">（「返金保証」を選んだ場合）</span></label>
-          <textarea id="guarantee_text" rows="2" placeholder="例: 初めてご購入いただいて商品が合わなかった場合、所定の条件のもとご返金対応いたします。"></textarea>
-        </div>
-        <div class="field">
-          <label>SNS掲載プラットフォーム <span style="font-weight:normal;color:var(--muted)">（「SNS掲載」を選んだ場合）</span></label>
-          <div class="check-group">
-            <label class="check-label"><input type="checkbox" name="sns_platforms" value="Instagram"> Instagram</label>
-            <label class="check-label"><input type="checkbox" name="sns_platforms" value="X（旧Twitter）"> X（旧Twitter）</label>
-            <label class="check-label"><input type="checkbox" name="sns_platforms" value="TikTok"> TikTok</label>
-            <label class="check-label"><input type="checkbox" name="sns_platforms" value="YouTube"> YouTube</label>
-            <label class="check-label"><input type="checkbox" name="sns_platforms" value="LINE"> LINE</label>
+          <div class="field">
+            <label>キャンペーンタイプ</label>
+            <div class="select-wrap">
+              <select id="campaign_type">
+                <option value="new_customer">新規顧客獲得</option>
+                <option value="launch">ローンチ</option>
+                <option value="sale">セール</option>
+                <option value="reactivation">休眠顧客向け</option>
+              </select>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </details>
 
-    <!-- フォーム設定 -->
-    <div class="form-section">
-      <div class="form-section__header">申し込みフォーム設定</div>
-      <div class="form-section__body">
-        <div class="field">
-          <label>フォームの入力項目 <span style="font-weight:normal;color:var(--muted)">（最大6項目推奨）</span></label>
-          <p class="field-hint">多すぎると離脱率が上がります。LPのゴールに合わせて必要なものだけ選んでください。</p>
-          <div class="check-group" id="form_fields_group">
-            <label class="check-label"><input type="checkbox" name="form_fields" value="氏名"> 氏名</label>
-            <label class="check-label"><input type="checkbox" name="form_fields" value="メールアドレス"> メールアドレス</label>
-            <label class="check-label"><input type="checkbox" name="form_fields" value="住所"> 住所</label>
-            <label class="check-label"><input type="checkbox" name="form_fields" value="電話番号"> 電話番号</label>
-            <label class="check-label"><input type="checkbox" name="form_fields" value="ニックネーム"> ニックネーム</label>
-            <label class="check-label"><input type="checkbox" name="form_fields" value="お問い合わせ内容"> お問い合わせ内容</label>
+    <!-- デザイン設定（折りたたみ） -->
+    <details class="adv" style="margin-top:16px">
+      <summary>カラー設定（スキップ可）</summary>
+      <div class="adv-body">
+        <p style="font-size:12px;color:var(--muted);margin-bottom:12px">「トンマナを提案してもらう」を押すと、カラーもあわせて提案されます。</p>
+        <div class="field-row field-row--3">
+          <div class="field">
+            <label>メインカラー</label>
+            <div class="color-field">
+              <input type="color" id="main_color_picker" value="#2c858c" oninput="document.getElementById('main_color').value=this.value">
+              <input type="text" id="main_color" value="#2c858c" placeholder="#000000" oninput="syncColor('main_color','main_color_picker')">
+            </div>
+          </div>
+          <div class="field">
+            <label>アクセントカラー</label>
+            <div class="color-field">
+              <input type="color" id="accent_color_picker" value="#1a2e5b" oninput="document.getElementById('accent_color').value=this.value">
+              <input type="text" id="accent_color" value="#1a2e5b" placeholder="#000000" oninput="syncColor('accent_color','accent_color_picker')">
+            </div>
+          </div>
+          <div class="field">
+            <label>背景カラー</label>
+            <div class="color-field">
+              <input type="color" id="base_bg_color_picker" value="#ededee" oninput="document.getElementById('base_bg_color').value=this.value">
+              <input type="text" id="base_bg_color" value="#ededee" placeholder="#FFFFFF" oninput="syncColor('base_bg_color','base_bg_color_picker')">
+            </div>
           </div>
         </div>
-        <div class="field">
-          <label>フォーム送信ボタンの文言</label>
-          <input type="text" id="form_submit_label" placeholder="例: 内容を確認して申し込む">
+        <div class="field-row field-row--2">
+          <div class="field">
+            <label>レイアウト幅</label>
+            <div class="select-wrap">
+              <select id="layout_width">
+                <option value="standard">標準</option>
+                <option value="narrow">ナロー</option>
+                <option value="wide">ワイド</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label>セクション間隔</label>
+            <div class="select-wrap">
+              <select id="section_spacing">
+                <option value="standard">標準</option>
+                <option value="large">広め</option>
+                <option value="compact">コンパクト</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="field-row field-row--2">
+          <div class="field">
+            <label>ヒーロー背景スタイル</label>
+            <div class="select-wrap">
+              <select id="hero_bg_style">
+                <option value="gradient">グラデーション</option>
+                <option value="solid">単色</option>
+                <option value="image">画像</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label>フォントスタイル</label>
+            <div class="select-wrap">
+              <select id="font_style">
+                <option value="sans">ゴシック体</option>
+                <option value="serif">明朝体</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </details>
+
+  </div>
+</div>
+
+<!-- ─────────────────── TAB 2: コンテンツ ─────────────────── -->
+<div id="tab-content" class="tab-pane">
+  <div class="tab-body">
+
+    <!-- AI補完バー（一括） -->
+    <div class="ai-bar">
+      <div class="ai-bar__text">
+        <strong>✦ AIが戦略下書きを作ります</strong><br>
+        カテゴリ・価格帯・ゴールから、ターゲット / 悩み / ベネフィット / FAQ / レビューをまとめて下書き
+      </div>
+      <div style="display:flex;gap:6px;flex-shrink:0">
+        <button class="btn-ai" id="btnAiAll" onclick="runAiAll(false)">まとめて下書き</button>
+        <button class="btn-ai btn-ai--outline" id="btnAiEmpty" onclick="runAiAll(true)">空欄だけ補完</button>
+      </div>
+    </div>
+
+    <!-- 商品概要 -->
+    <div class="section-block">
+      <div class="section-block__head">
+        <span class="section-block__title">商品・サービスの概要</span>
+        <span class="badge badge--ai">AI補完</span>
+        <button class="btn-ai" style="margin-left:auto;padding:4px 10px;font-size:11px" onclick="draftSingle('product_overview')">AIで下書き</button>
+      </div>
+      <p class="section-block__desc">空欄でも生成できます。あればあるほどLPの質が上がります。</p>
+      <div class="field">
+        <textarea id="product_overview" style="min-height:80px" placeholder="例：週2回・全12セッションの1対1コーチング。コーチが受講者の実際の業務を分析し、どのAIをどう使うかを一緒に設計します。"></textarea>
+      </div>
+    </div>
+
+    <!-- お客様の声 -->
+    <div class="section-block">
+      <div class="section-block__head">
+        <span class="section-block__title">お客様の声・レビュー</span>
+        <span class="badge badge--optional">任意</span>
+        <button class="btn-ai" style="margin-left:auto;padding:4px 10px;font-size:11px" onclick="draftReviews()">AI仮レビューを生成</button>
+      </div>
+      <p class="section-block__desc">最大3件。「AI仮レビューを生成」で叩き台を作れます。実際の声に編集してください。</p>
+      <div class="review-cards">
+        <div class="review-card">
+          <div class="review-card__head">レビュー 1</div>
+          <div class="review-card__body">
+            <textarea id="review_text_0" placeholder="体験談のテキスト（句読点・改行そのままで大丈夫です）"></textarea>
+            <div class="field-row field-row--2">
+              <input type="text" id="review_name_0" placeholder="名前・肩書き（例：山田さん）">
+              <input type="text" id="review_label_0" placeholder="属性（例：30代・会社員）">
+            </div>
+          </div>
+        </div>
+        <div class="review-card">
+          <div class="review-card__head">レビュー 2</div>
+          <div class="review-card__body">
+            <textarea id="review_text_1" placeholder="体験談のテキスト"></textarea>
+            <div class="field-row field-row--2">
+              <input type="text" id="review_name_1" placeholder="名前・肩書き">
+              <input type="text" id="review_label_1" placeholder="属性">
+            </div>
+          </div>
+        </div>
+        <div class="review-card">
+          <div class="review-card__head">レビュー 3</div>
+          <div class="review-card__body">
+            <textarea id="review_text_2" placeholder="体験談のテキスト"></textarea>
+            <div class="field-row field-row--2">
+              <input type="text" id="review_name_2" placeholder="名前・肩書き">
+              <input type="text" id="review_label_2" placeholder="属性">
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- 法的注意 -->
-    <div class="form-section">
-      <div class="form-section__header">表現ルール・法的注意</div>
-      <div class="form-section__body">
-        <div class="field">
-          <label>Claudeへの表現制約 <span style="font-weight:normal;color:var(--muted)">（1行1項目）</span></label>
-          <textarea id="legal_notes" rows="3" placeholder="例:&#10;薬機法に配慮すること&#10;効果効能を断定しないこと&#10;誇大表現を避けること"></textarea>
-          <p class="field-hint">ここに書いた制約に反するコピーはClaudeが生成しません。業種に応じて変更してください。</p>
+    <!-- FAQ -->
+    <div class="section-block">
+      <div class="section-block__head">
+        <span class="section-block__title">よくある質問（FAQ）</span>
+        <span class="badge badge--ai">AI補完</span>
+      </div>
+      <p class="section-block__desc">「下書きを作る」ボタンでカテゴリに合った内容を自動入力できます。</p>
+      <div id="faqList"></div>
+      <button onclick="addFaq()" style="margin-top:10px;padding:6px 14px;font-size:12px;font-family:inherit;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg);cursor:pointer;color:var(--muted)">+ 質問を追加</button>
+    </div>
+
+    <!-- 詳細コンテンツ（折りたたみ） -->
+    <details class="adv" id="advContent">
+      <summary>詳細コンテンツ（スキップ可・AIが戦略下書きを作ります）</summary>
+      <div class="adv-body">
+
+        <!-- ターゲット読者（深掘り）→ タブ①のフィールドと共有 -->
+        <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:4px">
+          <label style="margin-bottom:0">ターゲット読者（深掘り）</label>
+          <button class="btn-ai btn-ai--outline" style="padding:3px 9px;font-size:11px;flex-shrink:0;margin-left:8px" onclick="draftSingle('target_audience')">AIで下書き</button>
         </div>
+        <p style="font-size:11px;color:var(--muted);margin-bottom:6px">※ タブ①「AIトンマナ提案」のターゲット欄と連動しています。状況・心理・購買動機まで書くほどLPの精度が上がります。</p>
+        <div class="field">
+          <textarea id="target_audience_detail" style="min-height:90px" placeholder="例：30〜40代の社会人。過去に独学を試みたが続かなかった。「また同じことになるのでは」という懐疑心を持っている。無料体験で実感を得てから決断したいタイプ。"></textarea>
+        </div>
+
+        <!-- ターゲットの悩み（3層） -->
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;margin-top:4px">
+          <span style="font-size:12px;font-weight:700;color:var(--text)">ターゲットの悩み</span>
+          <span class="badge badge--ai">AI補完</span>
+          <button class="btn-ai btn-ai--outline" style="padding:3px 9px;font-size:11px;margin-left:auto" onclick="draftConcerns()">AIで下書き（3層）</button>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px">
+          <div>
+            <label style="font-size:11px;color:var(--muted);margin-bottom:3px">① 表面的な悩み <span class="hint">（目に見える課題・1行1件）</span></label>
+            <textarea id="concerns_surface" style="min-height:60px;font-size:13px" placeholder="何から始めればいいかわからない&#10;スキルが身についているか不安"></textarea>
+          </div>
+          <div>
+            <label style="font-size:11px;color:var(--muted);margin-bottom:3px">② 本音・潜在不安 <span class="hint">（心の奥にある感情）</span></label>
+            <textarea id="concerns_deep" style="min-height:60px;font-size:13px" placeholder="「また挫折するのでは」という過去の失敗が頭をよぎる&#10;お金と時間が無駄になるかもという損失回避"></textarea>
+          </div>
+          <div>
+            <label style="font-size:11px;color:var(--muted);margin-bottom:3px">③ 購買への抵抗 <span class="hint">（迷い・懐疑心・比較）</span></label>
+            <textarea id="concerns_resistance" style="min-height:60px;font-size:13px" placeholder="高単価への合理的な抵抗感&#10;「なぜ今決めなければいけないのか」という疑問"></textarea>
+          </div>
+        </div>
+
+        <!-- ベネフィット（3層） -->
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+          <span style="font-size:12px;font-weight:700;color:var(--text)">ベネフィット</span>
+          <span class="badge badge--ai">AI補完</span>
+          <button class="btn-ai btn-ai--outline" style="padding:3px 9px;font-size:11px;margin-left:auto" onclick="draftBenefits()">AIで下書き（3層）</button>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px">
+          <div>
+            <label style="font-size:11px;color:var(--muted);margin-bottom:3px">① 機能的ベネフィット <span class="hint">（何ができるようになるか）</span></label>
+            <textarea id="benefits_functional" style="min-height:60px;font-size:13px" placeholder="目標スキルが段階的に身につく&#10;わからない部分をすぐ質問できる環境"></textarea>
+          </div>
+          <div>
+            <label style="font-size:11px;color:var(--muted);margin-bottom:3px">② 感情的ベネフィット <span class="hint">（どんな気持ちになるか）</span></label>
+            <textarea id="benefits_emotional" style="min-height:60px;font-size:13px" placeholder="「自分にもできた」という自己効力感の回復&#10;焦りから解放される安心感"></textarea>
+          </div>
+          <div>
+            <label style="font-size:11px;color:var(--muted);margin-bottom:3px">③ 将来的な変化 <span class="hint">（○ヶ月後・生活変化）</span></label>
+            <textarea id="benefits_future" style="min-height:60px;font-size:13px" placeholder="6週間後、スキルを活用して仕事の質が変わる&#10;学習習慣が身につき独力で成長できるようになる"></textarea>
+          </div>
+        </div>
+
+        <!-- 主な特徴 -->
+        <div class="field">
+          <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:4px">
+            <label style="margin-bottom:0">主な特徴・特典 <span class="hint">（1行1件）</span></label>
+            <button class="btn-ai btn-ai--outline" style="padding:3px 9px;font-size:11px;flex-shrink:0;margin-left:8px" onclick="draftSingle('features')">AIで下書き</button>
+          </div>
+          <textarea id="features" style="min-height:70px" placeholder="1対1のパーソナルコーチング&#10;週2回・全12セッション（1回60分）"></textarea>
+        </div>
+
+        <!-- オファー詳細文 -->
+        <div class="field">
+          <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:4px">
+            <label style="margin-bottom:0">オファー詳細文</label>
+            <button class="btn-ai btn-ai--outline" style="padding:3px 9px;font-size:11px;flex-shrink:0;margin-left:8px" onclick="draftSingle('offer')">AIで下書き</button>
+          </div>
+          <textarea id="offer" style="min-height:56px" placeholder="初回セッション（60分）は無料で体験できます。終了後の申し込みは任意です。"></textarea>
+        </div>
+
+        <!-- 注意事項・免責 -->
+        <div class="field">
+          <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:4px">
+            <label style="margin-bottom:0">注意事項・免責 <span class="hint">（カテゴリに合わせて自動生成）</span></label>
+            <button class="btn-ai btn-ai--outline" style="padding:3px 9px;font-size:11px;flex-shrink:0;margin-left:8px" onclick="draftSingle('legal_disclaimers')">AIで下書き</button>
+          </div>
+          <textarea id="legal_disclaimers" style="min-height:56px" placeholder="個人の成果は状況により異なります。&#10;記載の体験談は個人の感想です。"></textarea>
+        </div>
+      </div>
+    </details>
+
+  </div>
+</div>
+
+<!-- ─────────────────── TAB 3: 画像 ─────────────────── -->
+<div id="tab-images" class="tab-pane">
+  <div class="tab-body">
+
+    <div class="section-block">
+      <div class="section-block__head">
+        <span class="section-block__title">LP用画像のアップロード</span>
+        <span class="badge badge--optional">すべて任意</span>
+      </div>
+      <p class="section-block__desc">画像がなくてもLPは生成されます。ゾーンに入れるだけで適切な場所に自動配置されます。</p>
+    </div>
+
+    <!-- ヒーロー背景 -->
+    <div class="upload-section">
+      <div class="upload-section__head">
+        <span class="upload-section__icon">🌅</span>
+        <span class="upload-section__title">ヒーロー背景画像</span>
+        <span class="upload-section__hint">最大1枚・横長推奨</span>
+      </div>
+      <div class="upload-section__body">
+        <div class="upload-zone" id="zone-hero"
+             ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event,'zone-hero','hero')">
+          <div class="upload-zone__icon">🖼</div>
+          <div class="upload-zone__label">ドラッグ＆ドロップ / クリックして選択</div>
+          <div class="upload-zone__sub">JPG・PNG・WebP ／ ページ全面に表示される背景画像</div>
+          <input type="file" accept=".jpg,.jpeg,.png,.webp" onchange="onFileSelect(event,'hero')">
+        </div>
+        <div id="grid-hero" class="image-grid"></div>
       </div>
     </div>
 
-  </div><!-- /form-wrap -->
-</div><!-- /tab-brand -->
-
-
-<!-- ── タブ②: コンテンツ素材 ── -->
-<div class="tab-panel" id="tab-content">
-  <div class="form-wrap">
-
-    <div class="form-section">
-      <div class="form-section__header">商品・サービスの説明</div>
-      <div class="form-section__body">
-        <div class="field">
-          <label>商品概要</label>
-          <textarea id="product_overview" rows="4" placeholder="例: 高保湿タイプの導入美容液。角質層までうるおいを届け、乾燥によるくすみが気になる肌をしっとりなめらかに整えます。"></textarea>
-          <p class="field-hint">「この商品は何ですか？」と聞かれたときの答えを2〜3文で。難しく考えず、口頭で説明するように書くのがコツです。</p>
+    <!-- 商品・人物写真 -->
+    <div class="upload-section">
+      <div class="upload-section__head">
+        <span class="upload-section__icon">📦</span>
+        <span class="upload-section__title">商品・人物写真</span>
+        <span class="upload-section__hint">最大1〜2枚</span>
+      </div>
+      <div class="upload-section__body">
+        <div class="upload-zone" id="zone-product"
+             ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event,'zone-product','product')">
+          <div class="upload-zone__icon">📸</div>
+          <div class="upload-zone__label">ドラッグ＆ドロップ / クリックして選択</div>
+          <div class="upload-zone__sub">商品パッケージ・コーチ写真・使用中の写真など</div>
+          <input type="file" accept=".jpg,.jpeg,.png,.webp" multiple onchange="onFileSelect(event,'product')">
         </div>
-        <div class="field">
-          <label>ターゲットの悩み <span style="font-weight:normal;color:var(--muted)">（1行1項目）</span></label>
-          <textarea id="target_concerns" rows="4" placeholder="例:&#10;肌の乾燥が気になるのに、何を使えばいいかわからない&#10;スキンケアに時間をかけられない&#10;強すぎる宣伝が苦手で、信頼できるブランドを探している"></textarea>
-          <p class="field-hint">「そうそう、これが悩みだ」と感じてもらえる言葉で。「〜できない」「〜が不安」という形が共感を生みやすい。</p>
-        </div>
-        <div class="field">
-          <label>ベネフィット <span style="font-weight:normal;color:var(--muted)">（1行1項目）</span></label>
-          <textarea id="benefits" rows="4" placeholder="例:&#10;忙しい朝でも、さっと使えてスキンケアが苦にならない&#10;うるおい感のある、なめらかな肌印象が続く&#10;スキンケアの時間が、前向きな気分になれる時間になる"></textarea>
-          <p class="field-hint">「機能」ではなく「使った後の嬉しさ・生活の変化」で書くと刺さります。NG：「セラミド配合」 → OK：「肌がもちっとして、朝のメイクのりが変わった」</p>
-        </div>
-        <div class="field">
-          <label>主な特徴 <span style="font-weight:normal;color:var(--muted)">（1行1項目）</span></label>
-          <textarea id="features" rows="4" placeholder="例:&#10;軽やかなテクスチャで、肌なじみが良い&#10;朝晩どちらにも使える設計&#10;敏感肌の方も取り入れやすいよう処方を吟味"></textarea>
-          <p class="field-hint">成分・仕様・設計など「なぜそのベネフィットが得られるか」の根拠を書くと説得力が増します。</p>
-        </div>
+        <div id="grid-product" class="image-grid"></div>
       </div>
     </div>
 
-    <div class="form-section">
-      <div class="form-section__header">オファー・CTA</div>
-      <div class="form-section__body">
-        <div class="field">
-          <label>オファー内容</label>
-          <input type="text" id="offer" placeholder="例: 初回限定 20%OFF / 送料無料">
+    <!-- SNS・レビュー写真 -->
+    <div class="upload-section">
+      <div class="upload-section__head">
+        <span class="upload-section__icon">📱</span>
+        <span class="upload-section__title">SNS・レビュー写真</span>
+        <span class="upload-section__hint">最大6枚・正方形推奨</span>
+      </div>
+      <div class="upload-section__body">
+        <div class="upload-zone" id="zone-sns"
+             ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event,'zone-sns','sns')">
+          <div class="upload-zone__icon">🖼</div>
+          <div class="upload-zone__label">ドラッグ＆ドロップ / クリックして選択</div>
+          <div class="upload-zone__sub">SNS投稿画像・お客様からもらった写真など（複数可）</div>
+          <input type="file" accept=".jpg,.jpeg,.png,.webp" multiple onchange="onFileSelect(event,'sns')">
         </div>
-        <div class="field">
-          <label>CTA補足メモ <span style="font-weight:normal;color:var(--muted)">（任意）</span></label>
-          <textarea id="cta_note" rows="2" placeholder="例: 迷っている方にも自然に背中を押せるような、やわらかい言葉で。購入を急かしすぎない。"></textarea>
-          <p class="field-hint">ボタン周辺のコピーの雰囲気について補足があれば。なければ空欄でOKです。</p>
-        </div>
+        <div id="grid-sns" class="image-grid"></div>
       </div>
     </div>
 
-    <div class="form-section">
-      <div class="form-section__header">よくある質問（FAQ）</div>
-      <div class="form-section__body">
-        <p class="field-hint" style="margin-bottom:4px">お客様が購入前に迷う質問を追加してください。3〜5問が目安です。</p>
-        <div class="faq-list" id="faq-list"></div>
-        <button class="btn-add" type="button" onclick="addFaq()">＋ 質問を追加する</button>
+    <!-- 補助画像 -->
+    <div class="upload-section">
+      <div class="upload-section__head">
+        <span class="upload-section__icon">🎨</span>
+        <span class="upload-section__title">補助画像・ロゴ・その他</span>
+        <span class="upload-section__hint">自動判定</span>
+      </div>
+      <div class="upload-section__body">
+        <div class="upload-zone" id="zone-other"
+             ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event,'zone-other','')">
+          <div class="upload-zone__icon">📁</div>
+          <div class="upload-zone__label">ドラッグ＆ドロップ / クリックして選択</div>
+          <div class="upload-zone__sub">ロゴ・バッジ・背景テクスチャ・その他（内容を見て自動配置）</div>
+          <input type="file" accept=".jpg,.jpeg,.png,.webp" multiple onchange="onFileSelect(event,'')">
+        </div>
+        <div id="grid-other" class="image-grid"></div>
       </div>
     </div>
 
-    <div class="form-section">
-      <div class="form-section__header">お客様の声・レビュー</div>
-      <div class="form-section__body">
-        <div class="field">
-          <label>レビュー <span style="font-weight:normal;color:var(--muted)">（1行1件）</span></label>
-          <textarea id="reviews" rows="5" placeholder="例:&#10;しっとり感があって、気分よく使えています（30代・乾燥肌）&#10;パッケージが上品で、洗面台に置いておきたくなる（30代・混合肌）&#10;忙しい日でも続けやすいテクスチャで助かっています（20代・普通肌）"></textarea>
-          <p class="field-hint">「（年代・肌タイプ）」などの属性を添えると信頼感が増します。3〜5件が目安。</p>
-        </div>
+    <div id="uploadStatus" style="font-size:12px;color:var(--green);margin-top:4px;display:none"></div>
+
+  </div>
+</div>
+
+<!-- ─────────────────── TAB 4: LP生成 ─────────────────── -->
+<div id="tab-generate" class="tab-pane">
+  <div class="gen-tab">
+
+    <div class="section-block">
+      <div class="section-block__head">
+        <span class="section-block__title">LP生成の準備</span>
+      </div>
+
+      <ul class="generate-checklist" id="genChecklist">
+        <li><span class="check-icon">○</span><span id="chk-brand">ブランド名・商品名を入力してください</span></li>
+        <li><span class="check-icon">○</span><span id="chk-cta">CTAボタンのテキストを入力してください</span></li>
+        <li><span class="check-icon">✓</span><span style="color:var(--muted)">コンテンツ・画像は任意です（空欄でも生成できます）</span></li>
+      </ul>
+
+      <button class="btn-generate" id="btnGenerate" onclick="doSaveAndGenerate()">
+        <span>⬇</span> 設定を保存してLP生成の準備をする
+      </button>
+    </div>
+
+    <div class="generate-success" id="generateSuccess">
+      <div class="generate-success__title">✓ 保存が完了しました。あと2ステップでLPが完成します。</div>
+      <ul class="step-list">
+        <li class="step-item">
+          <span class="step-num">1</span>
+          <span class="step-text">下の指示文をコピーしてください</span>
+        </li>
+        <li class="step-item">
+          <span class="step-num">2</span>
+          <span class="step-text"><strong>このプロジェクトフォルダで</strong>ターミナルを開き、生成ツールを起動してください</span>
+        </li>
+        <li class="step-item">
+          <span class="step-num">3</span>
+          <span class="step-text">コピーした指示文を貼り付けて送信してください</span>
+        </li>
+        <li class="step-item">
+          <span class="step-num">4</span>
+          <span class="step-text"><strong>output/index.html</strong> をブラウザで開けばLPの完成です</span>
+        </li>
+      </ul>
+
+      <div style="margin-top:14px">
+        <div style="font-size:12px;font-weight:600;color:#166534;margin-bottom:6px">生成指示文（コピーして使用）</div>
+        <div class="prompt-block" id="promptBlock">prompt/PROMPT.md の指示に従って作業してください。
+必要なファイルを読み込み、output/index.html を生成してください。<button class="copy-btn" id="copyBtn" onclick="copyPrompt()">コピー</button></div>
       </div>
     </div>
 
-    <div class="form-section">
-      <div class="form-section__header">ビジュアル素材（画像差し替え）</div>
-      <div class="form-section__body">
-        <p class="field-hint" style="margin-bottom:4px">画像ファイルがある場合はパスを入力してください。ない場合は空欄でOKです（CSSで代替されます）。<br>生成後のHTMLには <code>[IMAGE-PLACEHOLDER]</code> コメントが入るので、そこから差し替えられます。</p>
-        <div class="field">
-          <label>ヒーロー背景画像</label>
-          <input type="text" id="hero_image" placeholder="例: images/hero-bg.jpg（横長・1440×900px以上推奨）">
-        </div>
-        <div class="field">
-          <label>商品メイン画像</label>
-          <input type="text" id="product_image" placeholder="例: images/product-main.png（縦長・白背景または透過PNG推奨）">
-        </div>
-        <div class="field">
-          <label>SNS・ライフスタイル画像 <span style="font-weight:normal;color:var(--muted)">（カンマ区切りで複数可）</span></label>
-          <input type="text" id="sns_images" placeholder="例: images/sns-01.jpg, images/sns-02.jpg, images/sns-03.jpg">
-        </div>
-      </div>
-    </div>
+  </div>
+</div>
 
-    <div class="form-section">
-      <div class="form-section__header">注意事項・免責</div>
-      <div class="form-section__body">
-        <div class="field">
-          <label>フッターに掲載する注意書き <span style="font-weight:normal;color:var(--muted)">（1行1項目）</span></label>
-          <textarea id="legal_disclaimers" rows="3" placeholder="例:&#10;使用感には個人差があります。&#10;肌に異常が生じた場合はご使用を中止し、専門家にご相談ください。&#10;効果・効能を保証するものではありません。"></textarea>
-        </div>
-      </div>
-    </div>
-
-  </div><!-- /form-wrap -->
-</div><!-- /tab-content -->
-
-<!-- 固定保存バー -->
+<!-- 下部保存バー -->
 <div class="save-bar">
-  <span class="save-bar__msg" id="save-msg">入力内容を確認して「保存する」を押してください。</span>
-  <button class="btn btn--save" onclick="handleSave()">保存する</button>
+  <span class="save-bar__msg">① ② でコンテンツを入力 → 「保存」 → ④ で指示文を取得</span>
+  <button class="btn-save" id="btnSave" onclick="doSave()">設定を保存する</button>
 </div>
 
 <!-- トースト -->
-<div class="toast" id="toast"></div>
-
+<div id="toast"></div>
 
 <script>
-// ─────────────────────────────────────────────────────────────
-//  タブ切り替え
-// ─────────────────────────────────────────────────────────────
-function switchTab(name, btn) {
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('is-active'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('is-active'));
-  document.getElementById('tab-' + name).classList.add('is-active');
-  btn.classList.add('is-active');
+// ── タブ切り替え ───────────────────────────────────────────────────
+function switchTab(btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  const pane = document.getElementById(btn.dataset.tab);
+  if (pane) pane.classList.add('active');
+
+  if (btn.dataset.tab === 'tab-images') loadImages();
+  if (btn.dataset.tab === 'tab-generate') updateChecklist();
 }
 
-// ─────────────────────────────────────────────────────────────
-//  カラーピッカー同期
-// ─────────────────────────────────────────────────────────────
-function syncColor(picker, textId) {
-  document.getElementById(textId).value = picker.value;
-}
-function syncPicker(input, pickerId) {
-  const v = input.value.trim();
-  if (/^#[0-9A-Fa-f]{6}$/.test(v)) {
+// ── カラーピッカー同期 ──────────────────────────────────────────────
+function syncColor(textId, pickerId) {
+  const v = document.getElementById(textId).value;
+  if (/^#[0-9a-fA-F]{6}$/.test(v)) {
     document.getElementById(pickerId).value = v;
   }
 }
 
-// ─────────────────────────────────────────────────────────────
-//  FAQ 動的追加・削除
-// ─────────────────────────────────────────────────────────────
+// ── FAQ UI ────────────────────────────────────────────────────────
 let faqCount = 0;
-
-function addFaq(q, a) {
-  faqCount++;
-  const n = faqCount;
-  const list = document.getElementById('faq-list');
-  const item = document.createElement('div');
-  item.className = 'faq-item';
-  item.id = `faq-${n}`;
-  item.innerHTML = `
-    <div class="faq-item__head">
-      <span>Q&amp;A ${n}</span>
-      <button class="btn-text" type="button" onclick="removeFaq(${n})">削除</button>
+function addFaq(q = '', a = '') {
+  const i = faqCount++;
+  const list = document.getElementById('faqList');
+  const div = document.createElement('div');
+  div.className = 'review-card';
+  div.id = `faq-${i}`;
+  div.innerHTML = `
+    <div class="review-card__head" style="display:flex;justify-content:space-between;align-items:center">
+      <span>Q&A ${faqCount}</span>
+      <button onclick="removeFaq('faq-${i}')" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:13px">✕ 削除</button>
     </div>
-    <div class="faq-item__body">
-      <div class="field">
-        <label>質問</label>
-        <textarea id="faq_q_${n}" placeholder="例: 敏感肌でも使えますか？">${q || ''}</textarea>
-      </div>
-      <div class="field">
-        <label>回答</label>
-        <textarea id="faq_a_${n}" placeholder="例: すべての方に刺激が起こらないわけではありません。肌の状態に合わせてご使用ください。">${a || ''}</textarea>
-      </div>
+    <div class="review-card__body">
+      <input type="text" class="faq-q" placeholder="質問（例：どんな人に向いていますか？）" value="${escHtml(q)}">
+      <textarea class="faq-a" style="min-height:60px" placeholder="回答">${escHtml(a)}</textarea>
     </div>`;
-  list.appendChild(item);
+  list.appendChild(div);
 }
-
-function removeFaq(n) {
-  const el = document.getElementById(`faq-${n}`);
+function removeFaq(id) {
+  const el = document.getElementById(id);
   if (el) el.remove();
 }
-
-// ─────────────────────────────────────────────────────────────
-//  フォーム → データ取得
-// ─────────────────────────────────────────────────────────────
-function getChecked(name) {
-  return [...document.querySelectorAll(`input[name="${name}"]:checked`)].map(el => el.value);
-}
-
-function getRadio(name) {
-  const el = document.querySelector(`input[name="${name}"]:checked`);
-  return el ? el.value : '';
-}
-
-function getFaqs() {
-  const faqs = [];
-  document.querySelectorAll('.faq-item').forEach(item => {
-    const id = item.id.replace('faq-', '');
-    const q = (document.getElementById(`faq_q_${id}`) || {}).value || '';
-    const a = (document.getElementById(`faq_a_${id}`) || {}).value || '';
-    if (q || a) faqs.push({ q: q.trim(), a: a.trim() });
+function collectFaqs() {
+  const qs = document.querySelectorAll('#faqList .faq-q');
+  const as = document.querySelectorAll('#faqList .faq-a');
+  const result = [];
+  qs.forEach((q, i) => {
+    if (q.value.trim() || as[i].value.trim()) {
+      result.push({ q: q.value.trim(), a: as[i].value.trim() });
+    }
   });
-  return faqs;
+  return result;
+}
+function setFaqs(faqs) {
+  document.getElementById('faqList').innerHTML = '';
+  faqCount = 0;
+  (faqs || []).forEach(f => addFaq(f.q, f.a));
 }
 
-function collectBrandVars() {
+function escHtml(s) {
+  return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── カテゴリ変更 → トンマナ自動更新 ──────────────────────────────
+function onCategoryChange() {
+  // カテゴリ変更時はサイレントでトンマナを再計算して反映（表示はしない）
+  applyInferredTone(false);
+}
+function onGoalChange() {
+  applyInferredTone(false);
+}
+
+// ── AIトンマナ推定ロジック ──────────────────────────────────────────
+const TONE_LABELS = {
+  brand_tone: {
+    'premium, clean':       '上質・シンプル',
+    'premium, warm':        '上質・温かみ',
+    'warm, reassuring':     '温かみ・安心感',
+    'warm, clean':          '温かみ・クリーン',
+    'clean, warm':          'クリーン・温かみ',
+    'clean, reassuring':    'クリーン・信頼感',
+    'energetic, clean':     '活気・クリーン',
+    'energetic, bold':      '活気・力強い',
+    'energetic, playful':   '活気・楽しさ',
+    'playful, warm':        '楽しさ・温かみ',
+    'playful, energetic':   '楽しさ・活気',
+    'bold, energetic':      '力強い・活気',
+  },
+  hero_style: {
+    emotional: 'エモーショナル（感情訴求）',
+    proof:     '実績訴求',
+    product:   '商品中心',
+    lifestyle: 'ライフスタイル',
+  },
+  cta_style: {
+    soft:   'ソフト（押しつけない）',
+    bold:   'ボールド（行動促進）',
+    urgent: '緊急（限定・期間）',
+  },
+  structure_template: {
+    story: 'ストーリー型（共感重視）',
+    trust: '実績型（信頼・根拠重視）',
+    offer: 'オファー型（価格訴求）',
+  },
+};
+
+const COLOR_SUGGESTIONS = {
+  'course-high':       { main: '#F3E7E2', accent: '#2E2A29', bg: '#FFFFFF', label: 'クリーム × ダークブラウン（温かみ×高級感）' },
+  'course-mid':        { main: '#EAF4F4', accent: '#1A5C5C', bg: '#FFFFFF', label: 'ライトティール × ダークティール（クリーン）' },
+  'course-low':        { main: '#FFF7ED', accent: '#C2410C', bg: '#FFFFFF', label: 'ライトオレンジ × バーントオレンジ（活気）' },
+  'cosmetics-high':    { main: '#FDF2F8', accent: '#9D174D', bg: '#FFFFFF', label: 'ライトピンク × ローズ（プレミアム美容）' },
+  'cosmetics-mid':     { main: '#FEF3C7', accent: '#92400E', bg: '#FFFFFF', label: 'クリームイエロー × アンバー（温かみ）' },
+  'cosmetics-low':     { main: '#ECFDF5', accent: '#065F46', bg: '#FFFFFF', label: 'ライトグリーン × エメラルド（フレッシュ）' },
+  'supplement-high':   { main: '#F0FDF4', accent: '#14532D', bg: '#FFFFFF', label: 'ライトグリーン × ダークグリーン（健康・信頼）' },
+  'supplement-mid':    { main: '#FFF7ED', accent: '#7C2D12', bg: '#FFFFFF', label: 'ウォームクリーム × テラコッタ（自然素材感）' },
+  'supplement-low':    { main: '#ECFDF5', accent: '#065F46', bg: '#FFFFFF', label: 'フレッシュグリーン（アクティブ健康）' },
+  'app-high':          { main: '#EEF2FF', accent: '#1E1B4B', bg: '#FFFFFF', label: 'ライトインディゴ × ダークネイビー（テック高級）' },
+  'app-mid':           { main: '#EFF6FF', accent: '#1D4ED8', bg: '#FFFFFF', label: 'ライトブルー × ブルー（クリーンテック）' },
+  'app-low':           { main: '#F0FDF4', accent: '#15803D', bg: '#FFFFFF', label: 'ライトグリーン × グリーン（フレッシュ）' },
+  'default':           { main: '#F3E7E2', accent: '#2E2A29', bg: '#FFFFFF', label: 'ニュートラルベース' },
+};
+
+function inferTone(category, priceBand, lpGoal) {
+  let brand_tone, hero_style, cta_style, structure_template;
+
+  // cta_style: lp_goal 主体
+  if (lpGoal === 'purchase' && priceBand === 'low') {
+    cta_style = 'urgent';
+  } else if (lpGoal === 'purchase') {
+    cta_style = 'bold';
+  } else {
+    cta_style = 'soft';
+  }
+
+  // structure_template: lp_goal + category
+  if (lpGoal === 'trial' || lpGoal === 'line') {
+    structure_template = 'story';
+  } else if (lpGoal === 'purchase' && priceBand !== 'high') {
+    structure_template = 'offer';
+  } else if (lpGoal === 'inquiry' || priceBand === 'high') {
+    structure_template = 'trust';
+  } else {
+    structure_template = 'story';
+  }
+
+  // hero_style: price_band + lp_goal
+  if (priceBand === 'high') {
+    hero_style = (lpGoal === 'trial' || lpGoal === 'inquiry') ? 'emotional' : 'proof';
+  } else if (priceBand === 'mid') {
+    hero_style = 'emotional';
+  } else {
+    hero_style = 'lifestyle';
+  }
+
+  // brand_tone: category + price_band
+  const cat = category;
+  if (priceBand === 'high') {
+    if (cat === 'cosmetics' || cat === 'apparel') {
+      brand_tone = 'premium, clean';
+    } else if (cat === 'app') {
+      brand_tone = 'premium, clean';
+    } else {
+      brand_tone = 'premium, warm';
+    }
+  } else if (priceBand === 'mid') {
+    if (cat === 'cosmetics') {
+      brand_tone = 'warm, clean';
+    } else if (cat === 'supplement' || cat === 'food') {
+      brand_tone = 'warm, reassuring';
+    } else if (cat === 'app') {
+      brand_tone = 'clean, reassuring';
+    } else {
+      brand_tone = 'warm, reassuring';
+    }
+  } else {
+    // low
+    if (cat === 'cosmetics' || cat === 'supplement') {
+      brand_tone = 'playful, warm';
+    } else if (cat === 'app') {
+      brand_tone = 'energetic, clean';
+    } else {
+      brand_tone = 'energetic, playful';
+    }
+  }
+
+  // color suggestion
+  const colorKey = `${cat}-${priceBand}`;
+  const colors = COLOR_SUGGESTIONS[colorKey] || COLOR_SUGGESTIONS['default'];
+
+  return { brand_tone, hero_style, cta_style, structure_template, colors };
+}
+
+function applyInferredTone(showResult = true) {
+  const cat      = val('category');
+  const price    = val('price_band');
+  const goal     = val('lp_goal');
+  const result   = inferTone(cat, price, goal);
+
+  // 詳細設定フィールドに反映
+  setSelectVal('structure_template', result.structure_template);
+  setSelectVal('cta_style', result.cta_style);
+  setSelectVal('hero_style', result.hero_style);
+  setFieldVal('brand_tone', result.brand_tone);
+
+  if (showResult) {
+    // カラーも反映
+    setFieldVal('main_color', result.colors.main);
+    setFieldVal('accent_color', result.colors.accent);
+    setFieldVal('base_bg_color', result.colors.bg);
+    syncColor('main_color', 'main_color_picker');
+    syncColor('accent_color', 'accent_color_picker');
+    syncColor('base_bg_color', 'base_bg_color_picker');
+
+    // 結果パネル表示
+    const toneLabel = TONE_LABELS.brand_tone[result.brand_tone] || result.brand_tone;
+    document.getElementById('tr-tone').textContent     = toneLabel;
+    document.getElementById('tr-hero').textContent     = TONE_LABELS.hero_style[result.hero_style] || result.hero_style;
+    document.getElementById('tr-cta').textContent      = TONE_LABELS.cta_style[result.cta_style] || result.cta_style;
+    document.getElementById('tr-template').textContent = TONE_LABELS.structure_template[result.structure_template] || result.structure_template;
+    document.getElementById('tr-color').textContent    = result.colors.label;
+    document.getElementById('toneResult').classList.add('show');
+  }
+
+  return result;
+}
+
+function setSelectVal(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.value = val;
+}
+function setFieldVal(id, v) {
+  const el = document.getElementById(id);
+  if (el) el.value = v;
+}
+
+async function runToneInfer() {
+  const btn = document.getElementById('btnToneInfer');
+  btn.disabled = true;
+  btn.textContent = '提案中...';
+  await new Promise(r => setTimeout(r, 800));
+
+  applyInferredTone(true);
+
+  btn.disabled = false;
+  btn.textContent = '✦ トンマナを提案してもらう';
+  showToast('トンマナを提案しました（詳細設定に反映されています）');
+}
+
+// ── 戦略下書きデータ（knowledge/patterns から派生） ──────────────────
+const STRATEGY_DATA = {
+  course: {
+    faqs: [
+      { q: 'どんな人に向いていますか？', a: '「興味はあるけど何から始めればいいかわからない」という方に特に向いています。過去に独学や他の方法を試みたが続かなかった、という方に多くご利用いただいています。' },
+      { q: '完全な初心者でも参加できますか？', a: 'はい、前提知識は不要です。現在の状況からスタートできるよう、基礎から丁寧にサポートします。' },
+      { q: '1日どのくらいの時間が必要ですか？', a: 'セッション時間以外は1日15〜30分程度で取り組める設計です。忙しい方でも無理なく続けられます。' },
+      { q: '途中でやめた場合、返金はありますか？', a: '詳細はお申し込み前にご確認ください。まずは無料セッションで内容・雰囲気・相性を確かめてからご判断いただけます。' },
+      { q: 'プログラム終了後のサポートはありますか？', a: 'プログラム終了後も30日間のフォローアップがあります。新しい疑問が出てきたときもいつでも相談できます。' },
+    ],
+    target: '30〜50代の社会人。仕事・副業・キャリアで「現状を変えたい」と感じているが、なかなか動き出せていない。\n過去に独学や別の講座を試みたことがある。しかし忙しさや方向性の不明確さで途中で止まってしまった経験を持つ。「また同じことになるのでは」という既視感がある。\n高単価サービスへの懐疑心が強く、「本当に効果があるのか」「騙されたくない」という警戒ポイントを持っている。「自分には無理かも」という自己効力感の低さも隠れている。\n無料体験・初回お試しで実感を先に得られること、コーチや提供者の人柄・実績が信頼できると感じることが購買の決め手になる。',
+    concerns_surface: '何から始めればいいかわからない\nスキルが身についているか確認できない\n忙しくて時間が取れるか心配',
+    concerns_deep: '「また挫折するのではないか」という過去の失敗が頭をよぎる\n「このお金と時間が無駄になるかもしれない」という損失回避の感情\n「自分だけ理解できなかったら」という比較不安',
+    concerns_resistance: '高単価への合理的な抵抗感（他の選択肢との比較検討）\n「なぜ今決めなければいけないのか」という緊急性への疑問\n講師の質・サポート体制を申し込み前に確認できないことへの不安',
+    benefits_functional: '目標スキルが段階的・確実に身につく\nわからない部分をすぐに質問できる環境がある\nカリキュラムに沿って効率よく、最短ルートで学習できる',
+    benefits_emotional: '「自分にもできた」という自己効力感の回復\n「置いていかれている」という焦りから解放される\n学ぶことへの楽しさを取り戻し、毎日が少し前向きになる',
+    benefits_future: '6週間後、スキルを活用して仕事の質・スピードが変わる\n学習習慣が身につき、その後も独力で成長し続けられる\n「あのとき始めてよかった」と感じる人生の転換点になる',
+    features: '完全マンツーマンのパーソナルコーチング\n週2回・全12セッション（1回60分）\nセッション外も質問できるサポート体制\nプログラム終了後30日間のフォローアップ付き',
+    overview: '初心者から始められる、マンツーマン型のパーソナルコーチングプログラムです。週2回のセッションと日常の短時間ワークで、忙しい社会人でも着実に前に進めます。コーチが受講者の状況を丁寧に把握したうえで、最短ルートを一緒に設計します。',
+    reviews: [
+      { text: '「また続かないんじゃないか」と正直思っていました。でも、週2回コーチと話す時間があるだけで全然違いました。挫折しそうなときに引っ張ってもらえる感じが、一人での学習と決定的に違う点です。終わってみると「あの6週間があってよかった」と心から思っています。', name: '田中さん', label: '40代・会社員' },
+      { text: '最初は半信半疑でした。でも、無料セッションで話してみて「この人なら信頼できる」と感じたので申し込みました。自分のペースに合わせてもらえて、難しいと思っていた内容が少しずつわかるようになっていくのが面白かったです。', name: '佐藤さん', label: '30代・フリーランス' },
+      { text: '仕事が忙しくて「今じゃないかも」と思っていましたが、1日15〜30分で進められる設計がありがたかったです。セッション外でも質問できる環境があるので、詰まったときに止まらずに済みました。気づいたら6週間があっという間でした。', name: '山本さん', label: '30代・子育て中' },
+    ],
+    offer: '初回セッション（60分）は無料でお試しいただけます。実際のコーチと話してみて、プログラムの内容・雰囲気・相性を確かめてからご判断いただけます。申し込み後にしつこいご案内は一切ありません。',
+    legal: '個人の体験・成果には差があります。記載の体験談は個人の感想であり、同様の結果を保証するものではありません。景品表示法に基づき、過度な成果の断言は行っておりません。',
+  },
+  cosmetics: {
+    faqs: [
+      { q: '肌質を選びますか？', a: '乾燥肌・混合肌・脂性肌など様々な肌質に対応した処方です。使用前に必ずパッチテストをお試しください。' },
+      { q: '効果が出るまでどのくらいかかりますか？', a: '個人差はありますが、継続使用で4〜8週間を目安にご使用ください。毎日続けることで肌のリズムに馴染んでいきます。' },
+      { q: '敏感肌でも使えますか？', a: '低刺激処方で設計していますが、肌に合わない場合はすぐに使用を中止し、皮膚科医にご相談ください。' },
+      { q: '防腐剤・香料は入っていますか？', a: '詳細は成分表示をご確認ください。成分の開示は誠実に行っています。' },
+    ],
+    target: '20〜40代の女性。毎日のスキンケアに真剣に向き合っているが、なかなか「これだ」という一品に出会えていない。\nこれまで複数のスキンケア商品を試してきた。口コミを信じて購入したが思ったほど変化を感じられなかった経験がある。\n「また失敗するかもしれない」という購入疲れと、「成分・安全性への関心の高さ」を同時に持っている。敏感肌の場合はさらに慎重な判断基準を持つ。\n自分と似た肌質・悩みを持つ人の具体的なレビュー、成分の誠実な説明、試せる機会（トライアル）が購買の決め手になる。',
+    concerns_surface: '乾燥・くすみ・毛穴・年齢による肌変化が気になる\n合う化粧品がなかなか見つからない\n肌が敏感でかぶれることがある',
+    concerns_deep: '「また違う商品にお金をかけるのが怖い」という購入疲れ\n「本当に自分の肌質に合うか」という根本的な不安\n「成分が安全か」「添加物はどうか」という素材への不信感',
+    concerns_resistance: '新しいブランドへの信頼感の低さ（実績・口コミが少ない場合）\n価格に見合うか判断できない（試せない）\n使い始めてから効果が出るまで続けられるかの不安',
+    benefits_functional: '毎日のスキンケアが楽しくなる使い心地\n肌の調子が整い、ベースメイクのノリが変わる\n敏感肌でも続けやすい低刺激処方',
+    benefits_emotional: '鏡を見るのが少し楽しみになる\n「今日の肌、悪くない」と思える朝が増える\n自分の肌に向き合う時間が心地よくなる',
+    benefits_future: '続けることで肌本来の力が引き出されていく\n「これ、何使ってるの？」と聞かれるような肌の印象の変化\nスキンケアルーティンが定着し、毎日のちょっとした楽しみになる',
+    features: '低刺激・無香料処方\n敏感肌テスト済み\n毎日続けやすいテクスチャ設計\n厳選成分・誠実な成分開示',
+    overview: '肌への負担を最小限にしながら、毎日続けられるスキンケアを追求した処方です。敏感肌にも配慮した低刺激設計で、テクスチャや使い心地にも徹底的にこだわりました。',
+    reviews: [
+      { text: '敏感肌なので新しいものを試すのが怖かったのですが、使い始めて1週間で肌が落ち着いてきました。刺激が少なくて、テクスチャもなじみやすいです。香りが全然しないのもありがたかったです。', name: 'K.M さん', label: '30代・混合肌' },
+      { text: '数年間いろいろ試してきた中で、初めて「これだ」と思えた商品です。軽いのに翌朝の肌がもっちりしているのが不思議。3本目に入りました。', name: 'Y.T さん', label: '40代・乾燥肌' },
+      { text: '成分表示を必ず確認する派なので、こちらの処方の誠実さが決め手でした。2ヶ月使って、ファンデーションのノリが明らかに変わりました。', name: 'A.N さん', label: '30代・敏感肌' },
+    ],
+    offer: 'まずはトライアルセットでお試しください。実際に肌でご確認いただいてから、継続をご判断いただけます。',
+    legal: '肌への効果には個人差があります。使用後に肌に異常が現れた場合は、すぐに使用を中止し、皮膚科医にご相談ください。記載の体験談は個人の感想です。薬機法・景表法に基づき、効果の断定表現は行っておりません。',
+  },
+  supplement: {
+    faqs: [
+      { q: '1日どのくらい飲めばいいですか？', a: '1日の推奨量は商品パッケージに記載しています。過剰摂取はお控えください。' },
+      { q: '薬との飲み合わせは大丈夫ですか？', a: '薬を服用中の方は医師や薬剤師にご相談のうえでご使用ください。' },
+      { q: '効果はいつごろ実感できますか？', a: '個人差があります。継続的なご使用をお勧めします。即効性を保証するものではありません。' },
+      { q: '妊娠中・授乳中でも飲めますか？', a: '妊娠中・授乳中の方は医師にご相談のうえでご使用ください。' },
+    ],
+    target: '30〜60代の健康意識が高い人。食事管理だけでは不十分と感じており、サプリメントに関心を持っている。\n過去にも他のサプリを試したことがある。「効果があるのかよくわからなかった」「続けられなかった」という経験を持つ人が多い。\n「本当に効くのか」という根本的な懐疑心と、成分の安全性・飲み合わせへの不安を持っている。\n成分・配合量の根拠が明確であること、飲みやすさの説明、具体的な体験談（特に変化の時系列）が購買の決め手になる。',
+    concerns_surface: '疲れが取れない・体力の低下を感じる\n食事だけでは必要な栄養素が摂れているか不安\n継続できるサプリがこれまでなかった',
+    concerns_deep: '「サプリで本当に変わるのか」という根拠への疑問\n「どれが自分に合うか」という選択の難しさ\n「続けなければ意味がない」プレッシャーと、続けられなかった過去',
+    concerns_resistance: '価格に対する費用対効果への疑問\n飲み合わせや副作用への不安\n「また飲まなくなってしまうのではないか」という継続への不安',
+    benefits_functional: '必要な栄養素を手軽に補える\n飲みやすい形状・味で習慣化しやすい\n品質管理された成分配合で安心して続けられる',
+    benefits_emotional: '「ちゃんと体のことを考えている」という安心感\n毎朝のルーティンとして健康管理を実感できる\n体の変化に気づいたときの小さな喜び',
+    benefits_future: '継続することで体の土台がじっくり整っていく\n「これを飲んでいる」という習慣が自己管理の自信につながる\n将来の自分への投資として、今の選択を誇れる',
+    features: '吸収されやすい処方設計\n飲みやすいサイズ・無臭\n国内製造・品質管理徹底\n添加物を最小限に抑えた処方',
+    overview: '毎日続けやすさを徹底的に追求したサプリメントです。吸収されやすい形状と飲みやすさにこだわりながら、厳選した素材と透明性のある成分設計で、長く安心して使い続けられる処方にしました。',
+    reviews: [
+      { text: '正直、最初は半信半疑でした。でも1ヶ月続けてみると、朝の起き上がりが少し楽になった気がします。「気がする」レベルかもしれませんが、それでも続ける理由になっています。3ヶ月目に入りました。', name: 'T.K さん', label: '50代・会社員' },
+      { text: '飲みにくいサプリが多い中、これは本当に続けやすいです。においも少ないし、サイズも小さいので毎朝の習慣に組み込みやすかった。', name: 'M.S さん', label: '40代・主婦' },
+      { text: '成分表示が丁寧で、なぜこの配合なのかの説明が安心感につながりました。アレルギーがある私でも確認してから安心して始められました。', name: 'Y.A さん', label: '30代・敏感体質' },
+    ],
+    offer: '初回はお試しセットでご確認いただけます。体に合うかどうか、実際に試してからご判断ください。',
+    legal: '本製品は食品であり、疾病の診断・治療・予防を目的とするものではありません。体への効果には個人差があります。薬を服用中の方は医師にご相談のうえでご使用ください。妊娠中・授乳中の方は使用をお控えください。機能性表示食品の場合は表示内容をご確認ください。',
+  },
+  app: {
+    faqs: [
+      { q: '無料で使えますか？', a: '無料プランと有料プランがあります。まずは無料でお試しください。クレジットカードの登録は不要です。' },
+      { q: 'どのデバイスに対応していますか？', a: 'iOS・Android・PCブラウザに対応しています。デバイス間の同期もスムーズです。' },
+      { q: 'データは安全ですか？', a: 'データは暗号化して管理しており、第三者に提供することはありません。プライバシーポリシーをご確認ください。' },
+      { q: '解約はいつでもできますか？', a: 'はい、いつでも即時解約できます。違約金・解約手数料は一切ありません。' },
+    ],
+    target: 'ビジネスパーソン・フリーランス・個人事業主。業務効率化・生産性向上に関心が高い。\n現在の業務に非効率を感じており、何か改善できるツールを探している。しかし新しいツールの導入に時間がかかることを恐れている。\n「本当に自分の業務で使えるか」という具体性への疑問と、「慣れるまでが大変そう」という導入コストへの不安を持っている。\n実際に使うまでのステップが少ないこと、無料で試せること、自分の業務への適用イメージが湧くことが決め手になる。',
+    concerns_surface: '作業が非効率でムダな時間が多い\n手作業が多くてミスが起きやすい\n既存のツールでは物足りない',
+    concerns_deep: '「また使いこなせないまま終わるのでは」という過去のツール導入失敗の記憶\n「チームに展開するのが大変そう」という導入コストへの不安\n「本当にこれで時間が短縮できるか」という効果への疑問',
+    concerns_resistance: '月額コストへの費用対効果の疑問\n既存のワークフローを変えることへの心理的抵抗\nデータのセキュリティ・プライバシーへの不安',
+    benefits_functional: '繰り返し作業を自動化して毎週○時間を節約できる\n直感的な操作で、導入してすぐに使い始められる\nどのデバイスからでもアクセスできる',
+    benefits_emotional: '「これがあると助かる」と感じるツールに出会えた安心感\n本来やるべき仕事に集中できる充実感\nムダな作業へのストレスから解放される',
+    benefits_future: '毎週の時間削減が積み重なって、月単位で大きな差になる\n業務品質が上がり、成果・評価に直結してくる\n生産性の高い働き方が習慣になり、仕事のやり方が変わる',
+    features: '設定不要・インストール後すぐ使える\niOS・Android・PC ブラウザ対応\n無料プランあり（クレジットカード不要）\nデータは暗号化して安全に管理',
+    overview: 'すぐに使い始められる、シンプルで高機能なツールです。設定不要でインストール後すぐに使えます。直感的な操作で、初めてでも迷わず使えるように設計しました。',
+    reviews: [
+      { text: '最初の設定に20分もかからなかったのが正直驚きでした。UIがシンプルで「どこで何ができるか」がすぐわかります。1週間で、以前1時間かかっていた作業が30分で終わるようになりました。', name: 'K.T さん', label: '30代・マーケター' },
+      { text: '他のツールも試していたのですが、これが一番使いやすかったです。複数デバイス間の同期がスムーズで、外出先からでもストレスなく使えます。', name: 'M.Y さん', label: '40代・フリーランス' },
+      { text: 'まず無料で試せるのがありがたかった。試してみて「これは続けられる」と感じたので有料プランに変えました。コストに見合う効果は確実にあります。', name: 'S.H さん', label: '30代・個人事業主' },
+    ],
+    offer: 'まずは無料プランでお試しください。クレジットカードの登録不要で、今すぐ始められます。使い続けたいと思ったら、そのときに有料プランをご検討ください。',
+    legal: '無料プランの機能範囲については詳細ページをご確認ください。サービスの内容は予告なく変更される場合があります。ユーザーデータは暗号化して管理しており、第三者に提供することはありません。プライバシーポリシーをご確認ください。',
+  },
+  apparel: {
+    faqs: [
+      { q: 'サイズはどう選べばいいですか？', a: '商品ページのサイズガイドをご確認ください。迷う場合はお気軽にお問い合わせください。' },
+      { q: '素材・洗濯方法を教えてください。', a: '商品タグおよび詳細ページに記載しています。取り扱いには素材に合った方法でお願いします。' },
+      { q: '返品・交換はできますか？', a: '未使用・タグ付きの状態であれば返品・交換に対応しています。詳細はショッピングガイドをご確認ください。' },
+      { q: '長く着られますか？', a: 'トレンドに左右されないデザインと素材にこだわっています。丁寧にお使いいただければ長くご愛用いただけます。' },
+    ],
+    target: '20〜40代の女性・男性。ファッションに興味があり、「自分らしいスタイル」を探している。\nトレンドと自分のスタイルのバランスに悩んでいる。「似合うか」「長く使えるか」「コーデに合わせやすいか」を気にして、なかなか踏み出せないことがある。\n「着ている自分が想像できるか」という具体的なイメージへの欲求と、「買って後悔しないか」という損失回避を持っている。\nビジュアルと素材感が伝わること、着ているイメージが湧くこと、返品・交換が可能なことが決め手になる。',
+    concerns_surface: '似合うかどうかがわからない\n着回しが難しそう\n品質が長続きするか不安',
+    concerns_deep: '「買ったけど結局着なかった」という過去の失敗\n「これを着た自分が自分らしいか」という自己表現への迷い\n「他の人に見せたときどう思われるか」という承認への不安',
+    concerns_resistance: '高単価への費用対効果の疑問\nオンラインで素材・サイズ感がわかりにくい\n「今シーズンしか使えないのでは」というコスパへの疑問',
+    benefits_functional: '長く着られる素材・縫製でコスパが高い\n着回しのしやすいデザインで手持ちと合わせやすい\n丁寧な素材説明で購入前に質感をイメージできる',
+    benefits_emotional: '「これを着たい自分」に素直になれる\n着るたびに少しテンションが上がる\n「良いものを持っている」という静かな満足感',
+    benefits_future: '何年後も着続けられるアイテムになる\nワードローブの核になる一枚として長く使える\n「あのとき買ってよかった」と感じる定番になる',
+    features: '長く着られる素材・縫製\n着回しのしやすいデザイン\nサイズ展開豊富\n丁寧な素材・着用感の説明',
+    overview: '素材と縫製にこだわった、長く着られる一枚です。トレンドに左右されないデザインで、手持ちのアイテムとのコーデがしやすいように設計しました。',
+    reviews: [
+      { text: '届いたときの生地の質感に驚きました。着てみると体のラインがきれいに見えて、家族にも「それどこで買ったの？」と聞かれました。', name: 'H.K さん', label: '30代・会社員' },
+      { text: '買うかどうか迷いに迷いましたが、思い切って正解でした。素材が良くて、洗濯しても型崩れしない。2シーズン目に入っていますが、まだ現役です。', name: 'M.T さん', label: '40代・主婦' },
+      { text: 'オンラインで服を買うのが怖かったのですが、素材の説明が丁寧で安心できました。サイズ感も説明通りで、ストレスなく買い物できました。', name: 'Y.S さん', label: '30代・フリーランス' },
+    ],
+    offer: 'まずは1点からお試しください。素材・縫製・サイズ感をご確認いただいてから、続けてご愛用ください。',
+    legal: '素材の特性上、取り扱いには注意が必要な場合があります。洗濯表示をご確認のうえご使用ください。色味はモニターの環境により実物と若干異なる場合があります。',
+  },
+  food: {
+    faqs: [
+      { q: 'アレルギー情報を教えてください。', a: '商品詳細ページにアレルギー情報を記載しています。アレルギーをお持ちの方は必ずご確認ください。' },
+      { q: '賞味期限はどのくらいですか？', a: '商品パッケージに記載しています。開封後はお早めにお召し上がりください。' },
+      { q: 'ギフト包装はできますか？', a: 'はい、ギフト包装に対応しています。ご注文時にオプションをお選びください。' },
+      { q: '定期購入はできますか？', a: '定期購入プランをご用意しています。詳細は商品ページをご確認ください。' },
+    ],
+    target: '食へのこだわりがあり、「ちょっと良いもの」を探している人。自分へのご褒美や大切な人へのギフトを探している場合も多い。\n日常の食事は意識しているが、「本当においしいもの」に出会えていないと感じている。贈り物の場合は「喜んでもらえるか」という判断基準を持っている。\n「食べる前からテンションを上げたい」という期待感と、「もらった人に喜んでほしい」という気持ちを持っている。\n食べるシーンが想像できること、おいしさを言葉で実感できること、贈り物としての品格が購買の決め手になる。',
+    concerns_surface: '「ちょっといいもの」の選び方がわからない\n贈り物にふさわしいかどうか判断できない\nオンラインで味のイメージがわかりにくい',
+    concerns_deep: '「思っていた味と違った」という過去の失敗\n「もらった人の反応が期待外れだったら」というプレッシャー\n「これを選んで正解だったか」という自信のなさ',
+    concerns_resistance: '価格に見合う品質か確認できない\nアレルギーへの心配\n「手が込みすぎていて日常使いしにくいのでは」という懸念',
+    benefits_functional: '丁寧な素材・製法で、味の違いが実感できる\n贈り物として、相手に喜んでもらえるレベルの品格\nシンプルに続けて使いやすい',
+    benefits_emotional: '「いいもの選んだな」という満足感\n食べる瞬間の小さな幸せ\n贈った相手の笑顔を想像するときのわくわく感',
+    benefits_future: 'リピートしたいと思えるお気に入りの一品になる\n贈り物の定番として、毎年思い出してもらえる\n日常の中の「ちょっとした贅沢」の習慣になる',
+    features: '素材・製法にこだわった処方\n贈り物にも対応（ギフトラッピング可）\n少量からお試し可能\n製造情報・成分の透明な開示',
+    overview: '素材と製法にこだわった、日常のちょっとした贅沢に合う一品です。自分へのご褒美にも、大切な方へのギフトにも選ばれています。',
+    reviews: [
+      { text: '友人の誕生日に送ったら「今まで食べた中で一番おいしかった」と連絡が来ました。パッケージも丁寧で、贈り物にぴったりでした。自分用にもリピートしています。', name: 'T.M さん', label: '30代・会社員' },
+      { text: 'ご褒美に買ってみたのですが、これはちゃんと「ご褒美」になりました。日常のものと全然違う。ゆっくり味わえる余裕があるときに食べたい一品です。', name: 'K.Y さん', label: '40代・主婦' },
+      { text: 'オンラインで食べ物を買うのは不安でしたが、写真と説明が丁寧で安心できました。届いたときの包装も丁寧で、自分用なのに特別感がありました。', name: 'Y.H さん', label: '30代・フリーランス' },
+    ],
+    offer: '初回は少量のお試しセットからお試しください。味・品質をご確認いただいてから、定番にするかどうかをご判断ください。',
+    legal: 'アレルギー情報は商品詳細ページをご確認ください。開封後はお早めにお召し上がりください。賞味期限は商品パッケージをご確認ください。健康効果の断言は行っておりません。',
+  },
+  other: {
+    faqs: [
+      { q: 'どんな人に向いていますか？', a: 'お気軽にお問い合わせください。詳しくご説明します。' },
+      { q: 'サポート体制はどうなっていますか？', a: 'ご不明点はいつでもご連絡ください。迅速に対応します。' },
+      { q: 'キャンセルや変更はできますか？', a: '詳細はお申し込み前にご確認ください。' },
+    ],
+    target: '商品・サービスに関心を持つ方。具体的なターゲット像はカテゴリや商品概要に応じてカスタマイズしてください。\n現状の課題を解決したいと考えており、信頼できる選択肢を探しています。\n「本当に自分に合うか」「サポートはあるか」という不安を持っています。\n信頼できる情報・口コミ・無料体験などで確認できることが決め手になります。',
+    concerns_surface: '何から始めればいいかわからない\n自分に合うか不安\n費用対効果が見えにくい',
+    concerns_deep: '「また失敗するのでは」という過去の経験からくる不安\n「本当に必要か」という自問\n「もっと良い選択肢があるのでは」という比較への迷い',
+    concerns_resistance: '価格への疑問\nサポート体制が不明確\n「今決めなくていいのでは」という先延ばし',
+    benefits_functional: '具体的な課題を解決できる\n使いやすく続けやすい設計\n必要なサポートが得られる',
+    benefits_emotional: '「これで正解だった」という安心感\n自分の選択への自信\n新しいことを始めた前向きな気持ち',
+    benefits_future: '選んだ結果が積み重なって、生活・仕事が変わっていく\n「あのとき始めてよかった」という振り返り\n次の選択への自信につながる',
+    features: '丁寧なサポート体制\n必要なときに相談できる環境\n安心して続けられる設計',
+    overview: 'お客様の課題に真剣に向き合ったサービス・商品です。必要なサポートを必要なときに提供できる体制で、安心してご利用いただけます。',
+    reviews: [
+      { text: '最初は不安でしたが、始めてみてよかったと思っています。丁寧なサポートのおかげで、思っていたよりスムーズに進められました。', name: '田中さん', label: '30代' },
+      { text: '信頼できるかどうか迷っていましたが、担当者の誠実な対応が決め手になりました。結果として、選んで正解でした。', name: '佐藤さん', label: '40代' },
+      { text: 'ずっと迷っていたのですが、思い切って始めてよかったです。最初の一歩が一番難しかったですが、今は続けられています。', name: '山田さん', label: '30代' },
+    ],
+    offer: 'まずはお気軽にご相談ください。内容を確認してからご判断いただけます。しつこいご連絡は一切しません。',
+    legal: '個人の体験・成果には差があります。記載の情報は公開時点のものです。詳細はお問い合わせください。',
+  },
+};
+
+function getStrategy() {
+  const cat = val('category');
+  return STRATEGY_DATA[cat] || STRATEGY_DATA.other;
+}
+
+// ── 個別AI下書き ──────────────────────────────────────────────────
+async function draftSingle(fieldId) {
+  const s = getStrategy();
+  const map = {
+    product_overview:    s.overview,
+    target_audience:     s.target,
+    target_audience_detail: s.target,
+    features:            s.features,
+    offer:               s.offer,
+    legal_disclaimers:   s.legal,
+  };
+  const text = map[fieldId];
+  if (!text) return;
+  const el = document.getElementById(fieldId);
+  if (!el) return;
+  if (el.value.trim() && !confirm('既存の内容を上書きしますか？')) return;
+  el.disabled = true;
+  await new Promise(r => setTimeout(r, 600));
+  el.value = text;
+  el.disabled = false;
+  showToast('下書きを入力しました（内容を確認・編集してください）');
+}
+
+async function draftConcerns() {
+  const s = getStrategy();
+  const hasSome = val('concerns_surface') || val('concerns_deep') || val('concerns_resistance');
+  if (hasSome && !confirm('既存の悩み欄を上書きしますか？')) return;
+  await new Promise(r => setTimeout(r, 600));
+  setEl('concerns_surface',    s.concerns_surface    || '');
+  setEl('concerns_deep',       s.concerns_deep       || '');
+  setEl('concerns_resistance', s.concerns_resistance || '');
+  showToast('悩み（3層）の下書きを入力しました');
+}
+
+async function draftBenefits() {
+  const s = getStrategy();
+  const hasSome = val('benefits_functional') || val('benefits_emotional') || val('benefits_future');
+  if (hasSome && !confirm('既存のベネフィット欄を上書きしますか？')) return;
+  await new Promise(r => setTimeout(r, 600));
+  setEl('benefits_functional', s.benefits_functional || '');
+  setEl('benefits_emotional',  s.benefits_emotional  || '');
+  setEl('benefits_future',     s.benefits_future     || '');
+  showToast('ベネフィット（3層）の下書きを入力しました');
+}
+
+async function draftReviews() {
+  const s = getStrategy();
+  const hasReview = val('review_text_0') || val('review_text_1') || val('review_text_2');
+  if (hasReview && !confirm('既存のレビューを上書きしますか？（仮レビューです。実際の声に書き換えてください）')) return;
+  await new Promise(r => setTimeout(r, 800));
+  (s.reviews || []).forEach((r, i) => {
+    if (i > 2) return;
+    setEl(`review_text_${i}`,  r.text  || '');
+    setEl(`review_name_${i}`,  r.name  || '');
+    setEl(`review_label_${i}`, r.label || '');
+  });
+  showToast('仮レビューを入力しました（実際のお客様の声に書き換えてください）');
+}
+
+// ── 一括AI下書き ──────────────────────────────────────────────────
+async function runAiAll(emptyOnly = false) {
+  const btnAll   = document.getElementById('btnAiAll');
+  const btnEmpty = document.getElementById('btnAiEmpty');
+  if (btnAll)   { btnAll.disabled = true;   btnAll.textContent   = '下書き中...'; }
+  if (btnEmpty) { btnEmpty.disabled = true; btnEmpty.textContent = '補完中...'; }
+
+  await new Promise(r => setTimeout(r, 1000));
+  const s = getStrategy();
+
+  // 上書き確認（emptyOnly=false のときのみ）
+  const hasContent = val('product_overview') || val('concerns_surface') || val('benefits_functional');
+  if (!emptyOnly && hasContent && !confirm('既存のコンテンツを上書きしてまとめて下書きを作成しますか？')) {
+    if (btnAll)   { btnAll.disabled   = false; btnAll.textContent   = 'まとめて下書き'; }
+    if (btnEmpty) { btnEmpty.disabled = false; btnEmpty.textContent = '空欄だけ補完'; }
+    return;
+  }
+
+  const fill = (id, text) => {
+    if (!text) return;
+    if (emptyOnly && val(id)) return; // 空欄だけモード
+    setEl(id, text);
+  };
+
+  fill('product_overview',       s.overview);
+  fill('target_audience',        s.target);
+  fill('target_audience_detail', s.target);
+  fill('concerns_surface',    s.concerns_surface);
+  fill('concerns_deep',       s.concerns_deep);
+  fill('concerns_resistance', s.concerns_resistance);
+  fill('benefits_functional', s.benefits_functional);
+  fill('benefits_emotional',  s.benefits_emotional);
+  fill('benefits_future',     s.benefits_future);
+  fill('features',            s.features);
+  fill('offer',               s.offer);
+  fill('legal_disclaimers',   s.legal);
+
+  // FAQ（空のみ or 上書き）
+  const faqEmpty = collectFaqs().every(f => !f.q && !f.a);
+  if (!emptyOnly || faqEmpty) setFaqs(s.faqs || []);
+
+  // レビュー（空のみ or 上書き）
+  const reviewEmpty = !val('review_text_0') && !val('review_text_1') && !val('review_text_2');
+  if (!emptyOnly || reviewEmpty) {
+    (s.reviews || []).forEach((r, i) => {
+      if (i > 2) return;
+      if (emptyOnly && val(`review_text_${i}`)) return;
+      setEl(`review_text_${i}`,  r.text  || '');
+      setEl(`review_name_${i}`,  r.name  || '');
+      setEl(`review_label_${i}`, r.label || '');
+    });
+  }
+
+  // 詳細コンテンツを開く
+  const adv = document.getElementById('advContent');
+  if (adv) adv.open = true;
+
+  if (btnAll)   { btnAll.disabled   = false; btnAll.textContent   = 'まとめて下書き'; }
+  if (btnEmpty) { btnEmpty.disabled = false; btnEmpty.textContent = '空欄だけ補完'; }
+  showToast(emptyOnly ? '空欄を補完しました（内容を確認・編集してください）' : 'まとめて下書きを作成しました（内容を確認・編集してください）');
+}
+
+function fillIfEmpty(id, text) {
+  const el = document.getElementById(id);
+  if (el && !el.value.trim() && text) el.value = text;
+}
+
+// ── データ収集 ───────────────────────────────────────────────────
+function collectBrandData() {
   return {
-    brand_name:         val('brand_name'),
-    brand_tagline:      val('brand_tagline'),
-    product_name:       val('product_name'),
-    product_tagline:    val('product_tagline'),
-    category:           val('category'),
-    target_audience:    val('target_audience'),
-    lp_goal:            val('lp_goal'),
-    campaign_type:      val('campaign_type'),
-    brand_tone:         getChecked('brand_tone').join(', '),
-    hero_style:         getRadio('hero_style'),
-    cta_style:          getRadio('cta_style'),
-    font_style:         getRadio('font_style'),
-    price_band:         val('price_band'),
-    price_display:      val('price_display'),
-    offer_details:      val('offer_details'),
-    main_color:         val('main_color'),
-    accent_color:       val('accent_color'),
-    base_bg_color:      val('base_bg_color'),
-    hero_bg_style:      val('hero_bg_style'),
-    cta_label:          val('cta_label'),
-    cta_sub_label:      val('cta_sub_label'),
-    visual_keywords:    val('visual_keywords'),
-    trust_elements:     getChecked('trust_elements'),
-    guarantee_text:     val('guarantee_text'),
-    sns_platforms:      getChecked('sns_platforms'),
-    structure_template: getRadio('structure_template'),
-    form_fields:        getChecked('form_fields'),
-    form_submit_label:  val('form_submit_label'),
-    legal_notes:        val('legal_notes'),
-    layout_width:       getRadio('layout_width'),
-    section_spacing:    getRadio('section_spacing'),
+    brand_name:        val('brand_name'),
+    brand_tagline:     val('brand_tagline'),
+    product_name:      val('product_name'),
+    product_tagline:   val('product_tagline'),
+    category:          val('category'),
+    target_audience:   [val('target_audience'), val('target_audience_detail')].filter(Boolean).join('\n\n') || val('target_audience'),
+    lp_goal:           val('lp_goal'),
+    campaign_type:     val('campaign_type'),
+    brand_tone:        val('brand_tone'),
+    hero_style:        val('hero_style'),
+    cta_style:         val('cta_style'),
+    font_style:        val('font_style'),
+    price_band:        val('price_band'),
+    price_display:     val('price_display'),
+    offer_details:     val('offer_details'),
+    main_color:        val('main_color'),
+    accent_color:      val('accent_color'),
+    base_bg_color:     val('base_bg_color'),
+    hero_bg_style:     val('hero_bg_style'),
+    cta_label:         val('cta_label'),
+    cta_sub_label:     val('cta_sub_label'),
+    visual_keywords:   [],
+    trust_elements:    [],
+    guarantee_text:    val('guarantee_text'),
+    sns_platforms:     [],
+    structure_template: val('structure_template'),
+    form_fields:       val('form_fields_text').split('\n').map(s => s.trim()).filter(Boolean),
+    form_submit_label: val('form_submit_label'),
+    legal_notes:       [],
+    layout_width:      val('layout_width'),
+    section_spacing:   val('section_spacing'),
   };
 }
 
 function collectContentData() {
+  // 悩み3層を結合
+  const concernsParts = [
+    val('concerns_surface')    ? '【表面的な悩み】\n' + val('concerns_surface')    : '',
+    val('concerns_deep')       ? '【本音・潜在不安】\n' + val('concerns_deep')       : '',
+    val('concerns_resistance') ? '【購買への抵抗】\n' + val('concerns_resistance') : '',
+  ].filter(Boolean);
+  const target_concerns = concernsParts.join('\n\n');
+
+  // ベネフィット3層を結合
+  const benefitsParts = [
+    val('benefits_functional') ? '【機能的ベネフィット】\n' + val('benefits_functional') : '',
+    val('benefits_emotional')  ? '【感情的ベネフィット】\n' + val('benefits_emotional')  : '',
+    val('benefits_future')     ? '【将来的な変化】\n' + val('benefits_future')     : '',
+  ].filter(Boolean);
+  const benefits = benefitsParts.join('\n\n');
+
   return {
     product_overview:  val('product_overview'),
-    target_concerns:   val('target_concerns'),
-    benefits:          val('benefits'),
+    target_concerns,
+    benefits,
     features:          val('features'),
     offer:             val('offer'),
-    cta_note:          val('cta_note'),
-    faqs:              getFaqs(),
-    reviews:           val('reviews'),
-    hero_image:        val('hero_image'),
-    product_image:     val('product_image'),
-    sns_images:        val('sns_images'),
+    cta_note:          '',
+    faqs:              collectFaqs(),
+    reviews: [
+      { text: val('review_text_0'), name: val('review_name_0'), label: val('review_label_0') },
+      { text: val('review_text_1'), name: val('review_name_1'), label: val('review_label_1') },
+      { text: val('review_text_2'), name: val('review_name_2'), label: val('review_label_2') },
+    ],
+    hero_image:        'なし',
+    product_image:     'なし',
+    sns_images:        'なし',
     legal_disclaimers: val('legal_disclaimers'),
   };
 }
@@ -904,132 +1714,89 @@ function val(id) {
   return el ? el.value.trim() : '';
 }
 
-// ─────────────────────────────────────────────────────────────
-//  データ → フォームへ反映
-// ─────────────────────────────────────────────────────────────
-function populateBrandVars(b) {
-  setVal('brand_name',        b.brand_name);
-  setVal('brand_tagline',     b.brand_tagline);
-  setVal('product_name',      b.product_name);
-  setVal('product_tagline',   b.product_tagline);
-  setSelect('category',       b.category);
-  setVal('target_audience',   b.target_audience);
-  setSelect('lp_goal',        b.lp_goal);
-  setSelect('campaign_type',  b.campaign_type);
-  setVal('guarantee_text',    b.guarantee_text);
-  setVal('price_display',     b.price_display);
-  setVal('offer_details',     b.offer_details);
-  setVal('cta_label',         b.cta_label);
-  setVal('cta_sub_label',     b.cta_sub_label);
-  setVal('form_submit_label', b.form_submit_label);
-  setSelect('price_band',     b.price_band);
-  setSelect('hero_bg_style',  b.hero_bg_style);
-
-  // カラー
-  setColorField('main_color',     b.main_color);
-  setColorField('accent_color',   b.accent_color);
-  setColorField('base_bg_color',  b.base_bg_color);
-
-  // visual_keywords (配列 → 改行区切り)
-  const vk = Array.isArray(b.visual_keywords) ? b.visual_keywords.join('\n') : (b.visual_keywords || '');
-  setVal('visual_keywords', vk);
-
-  // legal_notes (配列 → 改行区切り)
-  const ln = Array.isArray(b.legal_notes) ? b.legal_notes.join('\n') : (b.legal_notes || '');
-  setVal('legal_notes', ln);
-
-  // brand_tone (カンマ区切り文字列 or 配列)
-  const tones = Array.isArray(b.brand_tone)
-    ? b.brand_tone
-    : (b.brand_tone || '').split(',').map(s => s.trim()).filter(Boolean);
-  setChecks('brand_tone', tones);
-
-  // trust_elements / sns_platforms / form_fields (配列)
-  setChecks('trust_elements', b.trust_elements || []);
-  setChecks('sns_platforms',  b.sns_platforms  || []);
-  setChecks('form_fields',    b.form_fields    || []);
-
-  // radio
-  setRadio('hero_style',         b.hero_style);
-  setRadio('cta_style',          b.cta_style);
-  setRadio('font_style',         b.font_style);
-  setRadio('structure_template', b.structure_template);
-  setRadio('layout_width',       b.layout_width);
-  setRadio('section_spacing',    b.section_spacing);
-}
-
-function populateContentData(c) {
-  setVal('product_overview',  c.product_overview);
-  setVal('target_concerns',   c.target_concerns);
-  setVal('benefits',          c.benefits);
-  setVal('features',          c.features);
-  setVal('offer',             c.offer);
-  setVal('cta_note',          c.cta_note);
-  setVal('reviews',           c.reviews);
-  setVal('hero_image',        c.hero_image === 'なし' ? '' : c.hero_image);
-  setVal('product_image',     c.product_image === 'なし' ? '' : c.product_image);
-  setVal('sns_images',        c.sns_images === 'なし' ? '' : c.sns_images);
-  setVal('legal_disclaimers', c.legal_disclaimers);
-
-  // FAQ
-  document.getElementById('faq-list').innerHTML = '';
-  faqCount = 0;
-  const faqs = c.faqs || [];
-  if (faqs.length === 0) faqs.push({ q: '', a: '' });
-  faqs.forEach(f => addFaq(f.q, f.a));
-}
-
-function setVal(id, v) {
-  const el = document.getElementById(id);
-  if (el && v != null) el.value = v;
-}
-function setSelect(id, v) {
-  const el = document.getElementById(id);
-  if (el && v) el.value = v;
-}
-function setRadio(name, v) {
-  if (!v) return;
-  const el = document.querySelector(`input[name="${name}"][value="${v}"]`);
-  if (el) el.checked = true;
-}
-function setChecks(name, vals) {
-  document.querySelectorAll(`input[name="${name}"]`).forEach(el => {
-    el.checked = vals.includes(el.value);
+// ── フォームへのデータ反映 ─────────────────────────────────────────
+function fillBrand(data) {
+  if (!data) return;
+  const fields = ['brand_name','brand_tagline','product_name','product_tagline','category',
+    'target_audience','lp_goal','campaign_type','brand_tone','hero_style','cta_style',
+    'font_style','price_band','price_display','offer_details','main_color','accent_color',
+    'base_bg_color','hero_bg_style','cta_label','cta_sub_label','guarantee_text',
+    'structure_template','layout_width','section_spacing'];
+  fields.forEach(f => {
+    const el = document.getElementById(f);
+    if (el && data[f] !== undefined) el.value = data[f];
+  });
+  const ff = document.getElementById('form_fields_text');
+  if (ff && Array.isArray(data.form_fields)) ff.value = data.form_fields.join('\n');
+  ['main_color','accent_color','base_bg_color'].forEach(f => {
+    const el = document.getElementById(f);
+    const pk = document.getElementById(f + '_picker');
+    if (el && pk && /^#[0-9a-fA-F]{6}$/.test(el.value)) pk.value = el.value;
   });
 }
-function setColorField(fieldId, v) {
-  if (!v) return;
-  setVal(fieldId, v);
-  const picker = document.getElementById(fieldId + '_picker');
-  if (picker && /^#[0-9A-Fa-f]{6}$/.test(v)) picker.value = v;
-}
 
-// ─────────────────────────────────────────────────────────────
-//  API: 読み込み / 保存
-// ─────────────────────────────────────────────────────────────
-async function handleLoad() {
-  setMsg('読み込み中...');
-  try {
-    const res = await fetch('/api/load');
-    const data = await res.json();
-    if (data.error) throw new Error(data.error);
-    populateBrandVars(data.brandVars || {});
-    populateContentData(data.contentData || {});
-    setMsg('ファイルを読み込みました。');
-    toast('読み込み完了', 'ok');
-  } catch (e) {
-    setMsg('読み込みエラー: ' + e.message);
-    toast('読み込みに失敗しました', 'err');
+function fillContent(data) {
+  if (!data) return;
+  const simple = ['product_overview','features','offer','legal_disclaimers'];
+  simple.forEach(f => {
+    const el = document.getElementById(f);
+    if (el && data[f] !== undefined) el.value = data[f];
+  });
+
+  // target_concerns → 3層に分解（【】ラベルで区切り）
+  if (data.target_concerns) {
+    const tc = data.target_concerns;
+    setEl('concerns_surface',    extractLayer(tc, '表面的な悩み'));
+    setEl('concerns_deep',       extractLayer(tc, '本音・潜在不安'));
+    setEl('concerns_resistance', extractLayer(tc, '購買への抵抗'));
+    // ラベルなし旧形式の場合はそのまま surface に入れる
+    if (!extractLayer(tc, '表面的な悩み') && !extractLayer(tc, '本音・潜在不安')) {
+      setEl('concerns_surface', tc);
+    }
   }
+
+  // target_audience → 詳細フィールドにも反映
+  if (data.target_audience) setEl('target_audience_detail', data.target_audience);
+
+  // benefits → 3層に分解
+  if (data.benefits) {
+    const b = data.benefits;
+    setEl('benefits_functional', extractLayer(b, '機能的ベネフィット'));
+    setEl('benefits_emotional',  extractLayer(b, '感情的ベネフィット'));
+    setEl('benefits_future',     extractLayer(b, '将来的な変化'));
+    if (!extractLayer(b, '機能的ベネフィット') && !extractLayer(b, '感情的ベネフィット')) {
+      setEl('benefits_functional', b);
+    }
+  }
+
+  const reviews = Array.isArray(data.reviews) ? data.reviews : [];
+  [0, 1, 2].forEach(i => {
+    const r = reviews[i] || {};
+    setEl(`review_text_${i}`, r.text || '');
+    setEl(`review_name_${i}`, r.name || '');
+    setEl(`review_label_${i}`, r.label || '');
+  });
+  setFaqs(data.faqs || []);
 }
 
-async function handleSave() {
-  const btn = document.getElementById('save-btn');
-  btn.disabled = true;
-  setMsg('保存中...');
+function extractLayer(text, label) {
+  const re = new RegExp('【' + label + '】\\n([\\s\\S]*?)(?=【|$)');
+  const m = text.match(re);
+  return m ? m[1].trim() : '';
+}
+
+function setEl(id, v) {
+  const el = document.getElementById(id);
+  if (el) el.value = v;
+}
+
+// ── 保存 ────────────────────────────────────────────────────────
+async function doSave() {
+  const btn = document.getElementById('btnSave');
+  btn.disabled = true; btn.textContent = '保存中...';
   try {
     const body = {
-      brandVars:   collectBrandVars(),
+      brandVars:   collectBrandData(),
       contentData: collectContentData(),
     };
     const res = await fetch('/api/save', {
@@ -1038,40 +1805,231 @@ async function handleSave() {
       body: JSON.stringify(body),
     });
     const data = await res.json();
-    if (!res.ok || data.error) throw new Error(data.error || 'サーバーエラー');
-    setMsg('保存しました — input/brand-vars.json と input/content-input.md を更新しました。');
-    toast('保存しました ✓', 'ok');
+    if (!res.ok) throw new Error(data.error || '保存に失敗しました');
+    showToast('保存しました');
   } catch (e) {
-    setMsg('保存エラー: ' + e.message);
-    toast('保存に失敗しました', 'err');
+    alert('エラー: ' + e.message);
   } finally {
-    btn.disabled = false;
+    btn.disabled = false; btn.textContent = '設定を保存する';
   }
 }
 
-function setMsg(text) {
-  const el = document.getElementById('save-msg');
-  if (el) el.textContent = text;
+async function doSaveAndGenerate() {
+  const btn = document.getElementById('btnGenerate');
+  btn.disabled = true;
+  btn.innerHTML = '<span>⏳</span> 保存中...';
+  try {
+    const body = {
+      brandVars:   collectBrandData(),
+      contentData: collectContentData(),
+    };
+    const res = await fetch('/api/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || '保存に失敗しました');
+    document.getElementById('generateSuccess').classList.add('show');
+    btn.innerHTML = '<span>✓</span> 保存完了';
+  } catch (e) {
+    alert('エラー: ' + e.message);
+    btn.disabled = false;
+    btn.innerHTML = '<span>⬇</span> 設定を保存してLP生成の準備をする';
+  }
 }
 
-let toastTimer;
-function toast(msg, type) {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.className = `toast toast--${type} show`;
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
+// ── チェックリスト更新 ────────────────────────────────────────────
+function updateChecklist() {
+  const brandOk = val('brand_name') && val('product_name');
+  const ctaOk   = val('cta_label');
+  const chkBrand = document.getElementById('chk-brand');
+  const chkCta   = document.getElementById('chk-cta');
+  const items    = document.querySelectorAll('.generate-checklist li');
+
+  if (chkBrand) {
+    chkBrand.textContent = brandOk ? 'ブランド名・商品名 ✓' : 'ブランド名・商品名を入力してください';
+    if (items[0]) items[0].querySelector('.check-icon').textContent = brandOk ? '✓' : '○';
+    if (items[0]) items[0].style.color = brandOk ? 'var(--green)' : 'var(--text)';
+  }
+  if (chkCta) {
+    chkCta.textContent = ctaOk ? 'CTAボタンのテキスト ✓' : 'CTAボタンのテキストを入力してください';
+    if (items[1]) items[1].querySelector('.check-icon').textContent = ctaOk ? '✓' : '○';
+    if (items[1]) items[1].style.color = ctaOk ? 'var(--green)' : 'var(--text)';
+  }
+  if (document.getElementById('btnGenerate')) {
+    document.getElementById('btnGenerate').disabled = false;
+  }
 }
 
-// ─────────────────────────────────────────────────────────────
-//  初期化
-// ─────────────────────────────────────────────────────────────
-window.addEventListener('DOMContentLoaded', () => {
-  // FAQ を最低1問追加
+// ── 画像アップロード（ゾーン別プレフィックス付与） ─────────────────
+const ZONE_PREFIXES = {
+  hero: 'hero-',
+  product: 'product-',
+  sns: 'sns-',
+  '': '',
+};
+
+// ゾーンIDと画像グリッドのマッピング
+const ZONE_GRID = {
+  'zone-hero':    'grid-hero',
+  'zone-product': 'grid-product',
+  'zone-sns':     'grid-sns',
+  'zone-other':   'grid-other',
+};
+
+// ファイルのプレフィックスからゾーングリッドIDを特定
+function getGridIdForFile(filename) {
+  const name = filename.toLowerCase();
+  if (name.startsWith('hero-'))    return 'grid-hero';
+  if (name.startsWith('product-')) return 'grid-product';
+  if (name.startsWith('sns-'))     return 'grid-sns';
+  return 'grid-other';
+}
+
+function onDragOver(e) {
+  e.preventDefault();
+  e.currentTarget.classList.add('drag-over');
+}
+function onDragLeave(e) {
+  e.currentTarget.classList.remove('drag-over');
+}
+async function onDrop(e, zoneId, prefix) {
+  e.preventDefault();
+  document.getElementById(zoneId).classList.remove('drag-over');
+  const files = Array.from(e.dataTransfer.files).filter(f => /\.(jpg|jpeg|png|webp)$/i.test(f.name));
+  for (const file of files) await uploadFile(file, prefix);
+  loadImages();
+}
+async function onFileSelect(e, prefix) {
+  const files = Array.from(e.target.files);
+  for (const file of files) await uploadFile(file, prefix);
+  e.target.value = '';
+  loadImages();
+}
+
+async function uploadFile(file, prefix = '') {
+  const status = document.getElementById('uploadStatus');
+  status.style.display = 'block';
+  status.style.color = 'var(--green)';
+  status.textContent = `アップロード中: ${file.name}`;
+  try {
+    const data = await toBase64(file);
+    // プレフィックスが指定されており、ファイル名がそのプレフィックスで始まっていない場合は付与
+    let filename = file.name;
+    if (prefix && !filename.toLowerCase().startsWith(prefix)) {
+      filename = prefix + filename;
+    }
+    const res = await fetch('/api/upload', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ filename, data }),
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || 'アップロード失敗');
+    status.textContent = `✓ アップロード完了: ${json.filename}`;
+    setTimeout(() => { status.style.display = 'none'; }, 2000);
+  } catch (e) {
+    status.style.color = 'var(--red)';
+    status.textContent = 'エラー: ' + e.message;
+  }
+}
+
+function toBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => resolve(e.target.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function deleteImage(filename) {
+  if (!confirm(`「${filename}」を削除しますか？`)) return;
+  try {
+    await fetch('/api/delete-image', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ filename }),
+    });
+    loadImages();
+  } catch (e) {
+    alert('削除に失敗しました: ' + e.message);
+  }
+}
+
+async function loadImages() {
+  try {
+    const res = await fetch('/api/list-images');
+    const data = await res.json();
+
+    // 全グリッドをクリア
+    ['grid-hero','grid-product','grid-sns','grid-other'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.innerHTML = '';
+    });
+
+    if (!data.files || data.files.length === 0) return;
+
+    data.files.forEach(f => {
+      const gridId = getGridIdForFile(f.name);
+      const grid = document.getElementById(gridId);
+      if (!grid) return;
+      const card = document.createElement('div');
+      card.className = 'image-card';
+      card.innerHTML = `
+        <img class="image-card__thumb" src="/uploads/${encodeURIComponent(f.name)}" alt="${escHtml(f.name)}" loading="lazy">
+        <div class="image-card__info">
+          <div class="image-card__name">${escHtml(f.name)}</div>
+        </div>
+        <button class="image-card__del" onclick="deleteImage('${escHtml(f.name)}')" title="削除">✕</button>`;
+      grid.appendChild(card);
+    });
+  } catch (e) {
+    console.error('画像の読み込みに失敗:', e);
+  }
+}
+
+// ── プロンプトコピー ──────────────────────────────────────────────
+function copyPrompt() {
+  const text = `prompt/PROMPT.md の指示に従って作業してください。\n必要なファイルを読み込み、output/index.html を生成してください。`;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = '✓ コピー完了';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'コピー'; btn.classList.remove('copied'); }, 2000);
+  }).catch(() => {
+    alert('コピーできませんでした。テキストを手動で選択してコピーしてください。');
+  });
+}
+
+// ── トースト ─────────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ── 初期化 ───────────────────────────────────────────────────────
+async function init() {
   addFaq();
-  // 既存ファイルを読み込む
-  handleLoad();
-});
+  try {
+    const res = await fetch('/api/load');
+    if (!res.ok) return;
+    const data = await res.json();
+    fillBrand(data.brandVars);
+    fillContent(data.contentData);
+    // 既存データがある場合、トンマナをサイレント反映
+    if (data.brandVars && data.brandVars.brand_name) {
+      applyInferredTone(false);
+    }
+  } catch (e) {
+    console.warn('既存データの読み込みをスキップ:', e.message);
+  }
+}
+
+init();
 </script>
 </body>
 </html>

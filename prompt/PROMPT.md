@@ -8,6 +8,19 @@
 エンドユーザーが入力した商材情報と、開発者が整備した knowledge パターンライブラリを組み合わせ、
 ペルソナに最適化されたコピー・構成・トーンのLPを HTML 単一ファイルで生成します。
 
+### knowledge の2層構造について
+
+knowledge フォルダは2つの層で構成されています:
+
+```
+knowledge/patterns/  ← LP 生成時に主参照するパターンライブラリ（整理済み）
+knowledge/raw/       ← 管理者が蓄積する素材置き場（補助参照のみ）
+```
+
+- **LP 生成時は `patterns/` を優先参照する**
+- `raw/` は `patterns/` に該当するパターンが存在しない場合のみ補助的に参照する
+- `raw/` の内容はそのまま使わず、必要なら抽象化・解釈して使う
+
 ---
 
 ## ステップ 1: ファイルの読み込み
@@ -18,12 +31,75 @@
 - `./input/brand-vars.json` — ブランド・デザイン設定
 - `./input/content-input.md` — コンテンツ素材
 
-**knowledge パターンライブラリ（開発者管理、エンドユーザーは触らない）**
-- `./knowledge/copy-hooks.md` — フックパターン（HOOK-01〜06）
-- `./knowledge/cta-patterns.md` — CTAパターン（CTA-S/B/U/M）
-- `./knowledge/section-patterns.md` — セクションパターン（SEC-ST/TR/OF/CMN）
-- `./knowledge/tone-patterns.md` — トーンパターン（TONE-01〜07、COMBO）
-- `./knowledge/category-playbooks.md` — カテゴリプレイブック（CAT-01〜06）
+**knowledge/patterns/（主参照 — LP 生成の選定基準）**
+- `./knowledge/patterns/copy-hooks.md` — フックパターン（HOOK-01〜06）
+- `./knowledge/patterns/cta-patterns.md` — CTAパターン（CTA-S/B/U/M）
+- `./knowledge/patterns/section-patterns.md` — セクションパターン（SEC-ST/TR/OF/CMN）
+- `./knowledge/patterns/tone-patterns.md` — トーンパターン（TONE-01〜07、COMBO）
+- `./knowledge/patterns/category-playbooks.md` — カテゴリプレイブック（CAT-01〜06）
+
+**knowledge/raw/（補助参照 — patterns に該当がない場合のみ）**
+- `./knowledge/raw/copy-collection.md` — コピー素材の羅列
+- `./knowledge/raw/lp-screenshot-notes.md` — LP観察メモ
+
+> raw の参照タイミング: patterns に合致するパターンがなく、かつ raw を参照することで
+> 今回の商材により適したアプローチを選べると判断した場合のみ。
+> raw の内容を直接コピーして使わず、必ず今回の商材・ペルソナの言葉に解釈・変換して使うこと。
+
+---
+
+## ステップ 1.5: 画像のスキャン・分類・配置計画
+
+knowledge の読み込みと並行して、LP に使える素材画像があるか確認します。
+
+### 1.5-1. assets/uploads/ のスキャン
+
+`./assets/uploads/` にある画像ファイルの一覧を取得してください。
+（`.gitkeep` と `README.txt` は除外。対象拡張子: .jpg .jpeg .png .webp）
+
+**ファイルが0件の場合:** 画像なしとして扱い、ステップ 2 に進む（変更なし）。
+
+### 1.5-2. 各画像を読み込んで分類
+
+画像ファイルが1枚以上ある場合、Read ツールで各画像を読み込み、
+以下の6ロールのいずれかに分類してください。
+
+| ロール | 判定基準 | LP内配置 | 使用上限 |
+|---|---|---|---|
+| `hero` | 横長・雰囲気重視・背景として機能する写真 | ヒーロー背景 | 1枚 |
+| `product` | 商品正面・人物写真（コーチ・モデル等） | 商品ビジュアル / プロフィール写真 | 1枚 |
+| `lifestyle` | 使用シーン・生活感のある写真 | フィーチャーセクション差し込み | 最大3枚 |
+| `sns` | 正方形・SNS 投稿風 | SNS グリッドタイル | 最大6枚 |
+| `logo` | ロゴ・バッジ・認定マーク | trust 要素行 | 制限なし |
+| `background` | テクスチャ・抽象的なパターン | セクション背景 | 最大2枚 |
+
+**判定の優先順序:**
+
+1. ファイル名プレフィックスがある場合は最優先で採用する
+   - `hero-` → hero, `product-` → product, `sns-` → sns
+   - `lifestyle-` → lifestyle, `logo-` → logo, `bg-` → background
+2. プレフィックスなしの場合: 画像を視覚的に判定する
+3. 判定が難しい場合: `lifestyle` に分類する
+
+**複数候補がある場合のルール:**
+- `hero` が2枚以上 → 最初の1枚のみ hero として使用。残りは lifestyle に再分類
+- `product` が2枚以上 → 最初の1枚のみ使用。残りは sns に転用
+- `sns` が足りない場合 → lifestyle を sns グリッドに転用可
+
+### 1.5-3. 配置計画を立てる（ステップ 5 の前に確定）
+
+分類結果から以下の配置計画を確定し、ステップ 5 での HTML 生成に反映します。
+
+| LP内の場所 | 使う画像（ロール） | 画像なしの場合のフォールバック |
+|---|---|---|
+| ヒーロー背景 | `hero` 1枚目 | CSS グラデーション（既存の方法） |
+| 商品ビジュアル | `product` 1枚目 | CSS グラデーションブロック |
+| SNS グリッド | `sns`（不足なら `lifestyle` で補完） | CSS カラーブロック（3枚未満なら SNS グリッド自体を非表示） |
+| セクション背景 | `background` 1枚目（任意） | CSS 背景色 |
+| プロフィール写真 | `category: course` の場合のみ `product` を転用 | CSS グラデーション円 |
+
+> **重要**: 画像が1枚もない場合は従来通りのプレースホルダー生成を行う。
+> 部分的に画像がある場合は、あるものだけ実画像を使い、ないものはフォールバック。
 
 ---
 
@@ -188,45 +264,88 @@ quality-first      : 素材・製法・ブランドの哲学に価値を置く
 | CTAセクション | 選定したフルCTA パターン | 最も強い文言 |
 | スティッキー | CTA-M01 | 短く・動詞で始める |
 
-### 画像プレースホルダーの生成（必須）
+### 画像の実装（ステップ 1.5 の配置計画に従う）
 
-以下の3箇所に HTML コメントを必ず挿入すること。
+ステップ 1.5 で立てた配置計画に基づき、**実画像か CSS フォールバックかを場所ごとに使い分けてください。**
+
+画像パスは `output/index.html` からの相対パスで記述します:
+
+```
+../assets/uploads/ファイル名.jpg
+```
 
 **① ヒーロー背景**
-```html
-<!-- ============================================================
-  [IMAGE-PLACEHOLDER: hero-bg]
-  場所    : ヒーローセクションの背景
-  推奨    : 1440×900px 以上、横長、ブランドの世界観を表す写真
-  差し替え: .hero__bg の CSS background を
-            background-image: url("images/hero-bg.jpg") に変更
-  現在    : CSS グラデーションで代替中
-  ============================================================ -->
-```
 
-**② 商品メイン画像**
-```html
-<!-- ============================================================
-  [IMAGE-PLACEHOLDER: product-main]
-  場所    : 商品紹介セクション
-  推奨    : 600×800px 以上、縦長、白背景または透過PNG
-  差し替え: <div class="product-visual"> を
-            <img src="images/product-main.png" alt="商品名"> に置き換える
-  現在    : CSS グラデーションで代替中
-  ============================================================ -->
-```
+- 実画像あり (`hero` ロール):
+  ```css
+  .hero {
+    background-image: url('../assets/uploads/ファイル名.jpg');
+    background-size: cover;
+    background-position: center;
+  }
+  ```
+  コメント:
+  ```html
+  <!-- [USING-REAL-IMAGE: hero-bg] ../assets/uploads/ファイル名.jpg -->
+  ```
 
-**③ SNS・レビュー画像タイル**
-```html
-<!-- ============================================================
-  [IMAGE-PLACEHOLDER: sns-tile]
-  場所    : 信頼セクション内のSNS掲載タイル（3〜6枚）
-  推奨    : 400×400px 以上、正方形
-  差し替え: 各 <div class="sns-tile"> を
-            <img src="images/sns-01.jpg" alt="SNS投稿"> に置き換える
-  現在    : CSS で代替中
-  ============================================================ -->
-```
+- 実画像なし (フォールバック):
+  ```html
+  <!-- [IMAGE-PLACEHOLDER: hero-bg]
+       推奨: 1440×900px 以上、横長、ブランドの世界観を表す写真
+       差し替え: .hero の CSS に background-image: url('../assets/uploads/your-hero.jpg') を追加
+       現在: CSS グラデーションで代替中 -->
+  ```
+
+**② 商品ビジュアル / プロフィール写真**
+
+- 実画像あり (`product` ロール):
+  ```html
+  <!-- [USING-REAL-IMAGE: product-main] ../assets/uploads/ファイル名.jpg -->
+  <img src="../assets/uploads/ファイル名.jpg"
+       alt="商品名またはコーチ名"
+       style="width:100%; height:100%; object-fit:cover; border-radius: inherit;">
+  ```
+
+- 実画像なし (フォールバック):
+  ```html
+  <!-- [IMAGE-PLACEHOLDER: product-main]
+       推奨: 600×800px 以上 (商品) / 正方形 (人物)
+       差し替え: プレースホルダー div を <img src="../assets/uploads/ファイル名.jpg"> に置き換える
+       現在: CSS グラデーションで代替中 -->
+  ```
+
+**③ SNS グリッドタイル**
+
+- 実画像あり (`sns` / `lifestyle` ロール):
+  ```html
+  <!-- [USING-REAL-IMAGE: sns-tile] 3枚: ファイル名1, ファイル名2, ファイル名3 -->
+  <div class="sns-grid">
+    <div class="sns-tile">
+      <img src="../assets/uploads/ファイル名1.jpg" alt="" style="width:100%;height:100%;object-fit:cover;">
+    </div>
+    <!-- 以下繰り返し -->
+  </div>
+  ```
+
+- 実画像なし (フォールバック):
+  ```html
+  <!-- [IMAGE-PLACEHOLDER: sns-tile]
+       推奨: 400×400px 以上、正方形
+       差し替え: 各 sns-tile に <img> を配置する
+       現在: CSS カラーブロックで代替中 -->
+  ```
+
+- SNS 画像が3枚未満: SNS グリッドセクション全体を非表示にする（`display:none` or 省略）
+
+**④ ライフスタイル画像（lifestyle ロール、任意）**
+
+lifestyle 画像がある場合は、フィーチャーセクションや中盤のセクション背景に差し込む。
+方法: `<img>` タグまたは CSS `background-image` で実装し、コメントで記録する。
+
+**⑤ ロゴ・バッジ（logo ロール、任意）**
+
+logo 画像がある場合は trust 要素行に `<img>` で配置する。
 
 ### 画像クラス名（必ず使用）
 
@@ -294,7 +413,9 @@ quality-first      : 素材・製法・ブランドの哲学に価値を置く
 - [ ] `trust_elements` がすべて自然な形で反映されているか
 - [ ] スマホ表示で崩れが起きないか（padding / max-width を確認）
 - [ ] 外部リソースへの参照がないか
-- [ ] 画像プレースホルダーコメントが3箇所すべてに入っているか
+- [ ] 各 IMAGE-PLACEHOLDER または USING-REAL-IMAGE コメントが3箇所すべてに入っているか
+- [ ] 実画像を使った場合、パスが `../assets/uploads/` を正しく参照しているか
+- [ ] SNS 画像が3枚未満の場合、SNS グリッドが非表示になっているか
 - [ ] example_lines をそのまま使っていないか（必ず商材の言葉に書き直す）
 
 ---
@@ -334,3 +455,29 @@ quality-first      : 素材・製法・ブランドの哲学に価値を置く
 ### 5. content-input.md が未入力の場合
 
 補完した内容の概要（記入済みの場合は「記入済み」とのみ記載）
+
+### 6. 画像配置レポート
+
+`./assets/image-manifest.md` を以下の内容で更新してください。
+
+```markdown
+## 最終生成日時
+[生成日時を記入]
+
+## 検出された画像ファイル
+[ファイル名リストを記入。0件の場合は「なし」]
+
+## 分類・配置結果
+
+| ファイル名 | 判定ロール | 判定根拠 | LP内配置場所 | 状態 |
+|---|---|---|---|---|
+| ファイル名 | hero / product / sns / ... | ファイル名ヒント or 視覚判定 | ヒーロー背景 etc. | 使用 / 未使用 |
+
+## 未使用画像
+[ロール定員超過などで使われなかったファイル名]
+
+## フォールバック一覧
+[画像がなく CSS プレースホルダーを使ったセクション名]
+```
+
+画像が0件の場合は「検出された画像ファイル: なし」とだけ記録してください。

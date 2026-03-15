@@ -47,19 +47,72 @@ Claude は「ペルソナを推定 → パターンを選ぶ → HTML/CSS/コピ
 knowledge フォルダは**開発者が管理する内部パターンライブラリ**です。
 
 ```
-エンドユーザーが触る層         開発者が管理する層（内部）         自動生成
-──────────────────────       ────────────────────────────────   ──────────────────────────────
-input/brand-vars.json  →     knowledge/copy-hooks.md            output/index.html
-input/content-input.md →     knowledge/cta-patterns.md
-                             knowledge/section-patterns.md
-                             knowledge/tone-patterns.md
-                             knowledge/category-playbooks.md
+エンドユーザーが触る層         開発者が管理する層（内部）               自動生成
+──────────────────────       ────────────────────────────────────────   ──────────────────────────────
+input/brand-vars.json  →     knowledge/patterns/copy-hooks.md          output/index.html
+input/content-input.md →     knowledge/patterns/cta-patterns.md
+                             knowledge/patterns/section-patterns.md
+                             knowledge/patterns/tone-patterns.md
+                             knowledge/patterns/category-playbooks.md
+                             ↑ LP生成時の主参照
+                             knowledge/raw/copy-collection.md      ← 管理者が雑に追加
+                             knowledge/raw/lp-screenshot-notes.md  ← 管理者が雑に追加
+                             knowledge/raw/screenshots/             ← 管理者が雑に追加
+                             ↑ LP生成時の補助参照（patterns に該当なしの場合のみ）
                     ↓        ↑
                     Claude が読み込み、ペルソナを推定し、パターンを選定する
 ```
 
 **エンドユーザーは knowledge を触りません。**
 knowledge の改善は開発者が行い、LP生成品質の向上に直接反映されます。
+
+---
+
+## knowledge の2層構造
+
+knowledge フォルダは **raw（素材層）** と **patterns（選定層）** の2層で構成されます。
+
+### raw/（素材置き場）
+
+管理者が雑多な素材をためる場所です。フォーマットは自由。
+
+| ファイル | 役割 |
+|---|---|
+| `raw/copy-collection.md` | 気になったコピー・フレーズの羅列 |
+| `raw/lp-screenshot-notes.md` | LP スクショから読み取った観察メモ |
+| `raw/screenshots/` | スクショ画像ファイル置き場 |
+
+**raw の使い方:**
+- 管理者が自由に追加するだけ。整理不要
+- Claude に「raw を patterns に反映して」と依頼すると、raw を読んで patterns を更新・追加する
+- LP 生成時には直接使わず、patterns に吸収された形で間接的に影響する
+
+### patterns/（選定ライブラリ）
+
+Claude が LP 生成時に参照する整理済みパターン集です。
+各パターンに `pattern_id` と `suitable_*` メタデータがあり、ペルソナとの照合に使います。
+
+| ファイル | 役割 |
+|---|---|
+| `patterns/copy-hooks.md` | フックパターン（HOOK-01〜06） |
+| `patterns/cta-patterns.md` | CTAパターン（CTA-S/B/U/M） |
+| `patterns/section-patterns.md` | セクションパターン（SEC-ST/TR/OF/CMN） |
+| `patterns/tone-patterns.md` | トーンパターン（TONE-01〜07、COMBO） |
+| `patterns/category-playbooks.md` | カテゴリプレイブック（CAT-01〜06） |
+
+### raw → patterns の変換フロー
+
+```
+管理者が raw/ に素材を追加
+    ↓
+「raw を patterns に反映して」と Claude に依頼
+    ↓
+Claude が raw/ を読んで抽象化・構造化
+    ↓
+patterns/ の既存パターンを更新 or 新しいパターンを追加
+```
+
+LP 生成時には patterns/ を主参照。raw/ は patterns に合致するパターンがない場合のみ補助的に参照する。
 
 ---
 
